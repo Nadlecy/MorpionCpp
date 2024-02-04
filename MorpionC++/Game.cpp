@@ -1,5 +1,77 @@
 #include "Game.h"
 
 Game::Game() {
+	currentGrid = new Grid();
+	currentPlayerTurn = 'O';
+	playing = true;
+}
 
+void Game::ChangeTurn() {
+	if (currentPlayerTurn == 'O') {
+		currentPlayerTurn = 'X';
+	}
+	else if (currentPlayerTurn == 'X') {
+		currentPlayerTurn == 'O';
+	}
+}
+
+void Game::Place() {
+	bool hasPlaced = false;
+	int boxIndex;
+	while (!hasPlaced) {
+		cout << "Player " << currentPlayerTurn << ", enter the index of the box you wwant to play " << endl;
+		cin >> boxIndex;
+		cout << endl;
+
+		if (boxIndex < 0 || boxIndex > 8) {
+			cout << "Please enter a valid number!";
+			continue;
+		}
+		else if (currentGrid->boxList[boxIndex]->GetValue() != ' ') {
+			cout << "This box is already taken!";
+			continue;
+		}
+		else {
+			currentGrid->boxList[boxIndex]->SetValue(currentPlayerTurn);
+			hasPlaced = true;
+		}
+	}
+}
+
+void Game::End(char Winner) {
+	if (Winner == ' ')
+		cout << "It's a draw!";
+	else
+		cout << Winner << " wins !";
+}
+
+void Game::Reset() {
+	delete currentGrid;
+	currentGrid = new Grid();
+	currentPlayerTurn = 'O';
+}
+
+void Game::Play() {
+	while (true) {
+		//Checking if there is still room to play.
+		if (currentGrid->IsFull()) {
+			End(' ');
+			break;
+		}
+
+		//Showing the grid
+		currentGrid->Display();
+
+		//Asking where the current player wants to play.
+		Place();
+
+		//A victory check happens at the end of every turn, so the moment the WinCheck succeeds, the current player is logically the winner.
+		if (currentGrid->WinCheck()){
+			End(currentPlayerTurn);
+			break;
+		}
+
+		//Switching turns.
+		ChangeTurn();
+	}
 }

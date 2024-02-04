@@ -7,14 +7,17 @@ using namespace std;
 
 class Game
 {
-	string playerName1;
-	string playerName2;
-
+public:
 	Grid* currentGrid;
-	int currentPlayer;
+	char currentPlayerTurn;
+	bool playing;
 
 	Game();
 
-	void NewGame();
+	void ChangeTurn();
+	void Place();
+	void End(char Winner);
+	void Reset();
+	void Play();
 };
 
