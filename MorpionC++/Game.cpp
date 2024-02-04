@@ -23,6 +23,8 @@ void Game::Place() {
 		cin >> boxIndex;
 		cout << endl;
 
+		cin.clear();
+
 		if (boxIndex < 0 || boxIndex > 8) {
 			cout << "Please enter a valid number!";
 			continue;
@@ -54,11 +56,13 @@ bool Game::AskReplay() {
 		cin >> answer;
 		cout << endl;
 
+		cin.clear();
+
 		if(answer == "Yes" || answer == "yes" || answer == "Y" || answer == "y"){
 			return true;
 		}
 		else if (answer == "No" || answer == "no" || answer == "N" || answer == "n") {
-			return false;
+			return false; 
 		}
 		else {
 			cout << "Please answer with yes or no." << endl;
