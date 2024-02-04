@@ -10,7 +10,6 @@ Grid::Grid() {
 
 //shows the current state of the grid in the console
 void Grid::Display() {
-	system("cls");
 	for (int line = 0; line < 3; line++) {
 		for (int column = 0; column < 3; column++) {
 			cout << boxList[line * 3 + column]->GetValue();
@@ -33,12 +32,14 @@ char Grid::WinCheck() {
 	//checking the lines
 	for (int i = 0; i < 3; i++) {
 		if (boxList[i * 3]->GetValue() == boxList[i * 3 + 1]->GetValue() == boxList[i * 3 + 2]->GetValue())
+			cout << "gagné, " << boxList[i * 3]->GetValue();
 			return boxList[i * 3]->GetValue();
 	}
 
 	//checking the columns
 	for (int i = 0; i < 3; i++) {
 		if (boxList[i]->GetValue() == boxList[i + 3]->GetValue() == boxList[i + 6]->GetValue())
+			cout << "gagné, " << boxList[i]->GetValue();
 			return boxList[i]->GetValue();
 	}
 

@@ -40,9 +40,9 @@ void Game::Place() {
 
 void Game::End(char Winner) {
 	if (Winner == ' ')
-		cout << "It's a draw!";
+		cout << "It's a draw!" << endl;
 	else
-		cout << Winner << " wins !";
+		cout << Winner << " wins !" << endl;
 }
 
 bool Game::AskReplay() {
@@ -85,7 +85,8 @@ void Game::Play() {
 		Place();
 
 		//A victory check happens at the end of every turn, so the moment the WinCheck succeeds, the current player is logically the winner.
-		if (currentGrid->WinCheck()){
+		if (currentGrid->WinCheck() != ' ') {
+			cout << currentGrid->WinCheck();
 			End(currentPlayerTurn);
 			break;
 		}
