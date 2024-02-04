@@ -12,7 +12,7 @@ void printBoard(const vector<vector<char>>& board) {
         cout << endl;
     }
 }
-*/
+
 // Function to check if a player has won
 bool checkWin(const vector<vector<char>>& board, char player) {
     // Check rows and columns
@@ -29,7 +29,7 @@ bool checkWin(const vector<vector<char>>& board, char player) {
 
     return false;
 }
-/*
+
 // Function to check if the board is full (draw)
 bool checkDraw(const vector<vector<char>>& board) {
     for (const auto& row : board) {
