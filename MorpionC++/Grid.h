@@ -1,12 +1,14 @@
 #pragma once
-#include <vector>
-
 #include "GridBox.h"
+
+#include <vector>
+#include <iostream>
 
 using namespace std;
 
 class Grid
 {
+public:
 	vector<GridBox*> boxList;
 
 	Grid();

@@ -2,6 +2,7 @@
 
 class GridBox
 {
+public:
 	char value;
 
 	GridBox();

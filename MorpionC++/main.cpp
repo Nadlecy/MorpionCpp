@@ -2,7 +2,7 @@
 #include <vector>
 
 using namespace std;
-
+/*
 // Function to print the tic-tac-toe board
 void printBoard(const vector<vector<char>>& board) {
     for (const auto& row : board) {
@@ -12,7 +12,7 @@ void printBoard(const vector<vector<char>>& board) {
         cout << endl;
     }
 }
-
+*/
 // Function to check if a player has won
 bool checkWin(const vector<vector<char>>& board, char player) {
     // Check rows and columns
@@ -29,7 +29,7 @@ bool checkWin(const vector<vector<char>>& board, char player) {
 
     return false;
 }
-
+/*
 // Function to check if the board is full (draw)
 bool checkDraw(const vector<vector<char>>& board) {
     for (const auto& row : board) {
@@ -41,7 +41,7 @@ bool checkDraw(const vector<vector<char>>& board) {
     }
     return true;
 }
-
+*/
 int main() {
     vector<vector<char>> board(3, vector<char>(3, ' ')); // Initialize an empty 3x3 board
     char currentPlayer = 'X';
