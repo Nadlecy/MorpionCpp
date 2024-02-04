@@ -16,6 +16,5 @@ public:
 	void Display();
 	bool IsFull();
 	char WinCheck();
-	
 };
 
