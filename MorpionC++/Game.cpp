@@ -11,7 +11,7 @@ void Game::ChangeTurn() {
 		currentPlayerTurn = 'X';
 	}
 	else if (currentPlayerTurn == 'X') {
-		currentPlayerTurn == 'O';
+		currentPlayerTurn = 'O';
 	}
 }
 
@@ -45,6 +45,25 @@ void Game::End(char Winner) {
 		cout << Winner << " wins !";
 }
 
+bool Game::AskReplay() {
+	string answer;
+	while (true) {
+		cout << "Would you like to play again ? Y/N" << endl;
+		cin >> answer;
+		cout << endl;
+
+		if(answer == "Yes" || answer == "yes" || answer == "Y" || answer == "y"){
+			return true;
+		}
+		else if (answer == "No" || answer == "no" || answer == "N" || answer == "n") {
+			return false;
+		}
+		else {
+			cout << "Please answer with yes or no." << endl;
+		}
+	}
+}
+
 void Game::Reset() {
 	delete currentGrid;
 	currentGrid = new Grid();
@@ -74,4 +93,5 @@ void Game::Play() {
 		//Switching turns.
 		ChangeTurn();
 	}
+	playing = AskReplay();
 }

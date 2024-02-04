@@ -10,6 +10,7 @@ Grid::Grid() {
 
 //shows the current state of the grid in the console
 void Grid::Display() {
+	system("cls");
 	for (int line = 0; line < 3; line++) {
 		for (int column = 0; column < 3; column++) {
 			cout << boxList[line * 3 + column]->GetValue();
