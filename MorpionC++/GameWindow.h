@@ -14,7 +14,8 @@ public:
     int gameSquareS;
 
     sf::CircleShape* oCircle; 
-    sf::RectangleShape* oCrossBit;
+    sf::RectangleShape* oCrossBit1;
+    sf::RectangleShape* oCrossBit2;
 
 
     GameWindow();
