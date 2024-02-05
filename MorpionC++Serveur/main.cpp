@@ -6,7 +6,7 @@
 #include <iphlpapi.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <string.h>+
 
 #define PORT 6969
 
@@ -71,7 +71,7 @@ int main(int argc, char const* argv[]) {
     valread = recv(new_socket, buffer, 1024 - 1, 0); // subtract 1 for the null
     // terminator at the end
     printf("%s\n", buffer);
-    send(new_socket, "tu te chut toi", strlen("tu te chut toi"), 0);
+    send(new_socket, "Hello from server", strlen("Hello from server"), 0);
     printf("Hello message sent\n");
 
     // closing the connected socket
