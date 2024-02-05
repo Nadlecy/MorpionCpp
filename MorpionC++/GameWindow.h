@@ -9,11 +9,18 @@ public:
     sf::RenderWindow* oWindow;
     sf::VideoMode oVideoMode;
     sf::Vector2i localPosition;
-    int screenW;
-    int screenH;
+    int windowW;
+    int windowH;
+    int gameSquareS;
+
+    sf::CircleShape* oCircle; 
+    sf::RectangleShape* oCrossBit;
+
 
     GameWindow();
 
-    void Display();
+    void DrawCircle(int posX, int posY);
+    void DrawCross(int posX, int posY);
+    void Display(Grid* grid);
 };
 

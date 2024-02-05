@@ -1,6 +1,7 @@
 #include "Game.h"
 
 Game::Game() {
+	window = new GameWindow();
 	currentGrid = new Grid();
 	currentPlayerTurn = 'O';
 	playing = true;
@@ -85,6 +86,7 @@ void Game::Play() {
 		}
 
 		//Showing the grid
+		window->Display(currentGrid);
 		currentGrid->Display();
 
 		//Asking where the current player wants to play.
