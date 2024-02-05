@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{20092eb8-5677-4fc6-80e7-a7b8815b50c9}</ProjectGuid>
-    <RootNamespace>MorpionCServeur</RootNamespace>
+    <ProjectGuid>{55729fd2-8dbb-407f-ad71-e733c7cbeaf0}</ProjectGuid>
+    <RootNamespace>MorpionCClient</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
