@@ -43,6 +43,7 @@ void Game::Place() {
 
 void Game::End(char Winner) {
 	currentGrid->Display();
+	window->Display(currentGrid);
 
 	if (Winner == ' ')
 		cout << "It's a draw!" << endl;
