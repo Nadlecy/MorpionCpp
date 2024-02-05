@@ -35,7 +35,6 @@ int main(int argc, char const* argv[]) {
         return 1;
     }
 
-
     // Creating socket file descriptor
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         perror("socket failed");
@@ -49,14 +48,13 @@ int main(int argc, char const* argv[]) {
         perror("setsockopt");
         exit(EXIT_FAILURE);
     }
+    
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
     address.sin_port = htons(PORT);
 
     // Forcefully attaching socket to the port 6969
-    if (bind(server_fd, (struct sockaddr*)&address,
-        sizeof(address))
-        < 0) {
+    if (bind(server_fd, (struct sockaddr*)&address, sizeof(address)) < 0) {
         perror("bind failed");
         exit(EXIT_FAILURE);
     }
@@ -68,10 +66,11 @@ int main(int argc, char const* argv[]) {
         perror("accept");
         exit(EXIT_FAILURE);
     }
+
     valread = recv(new_socket, buffer, 1024 - 1, 0); // subtract 1 for the null
     // terminator at the end
     printf("%s\n", buffer);
-    send(new_socket, "Hello from server", strlen("Hello from server"), 0);
+    send(new_socket, "0X0XX0X00", strlen("0X0XX0X00"), 0);
     printf("Hello message sent\n");
 
     // closing the connected socket

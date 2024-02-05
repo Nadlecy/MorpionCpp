@@ -26,7 +26,6 @@ int main(int argc, char const* argv[])
 		return 1;
 	}
 
-
 	int status, valread, client_fd;
 	struct sockaddr_in serv_addr;
 	char buffer[1024] = { 0 };
@@ -42,8 +41,7 @@ int main(int argc, char const* argv[])
 	// form
 	if (inet_pton(AF_INET, "10.1.144.26", &serv_addr.sin_addr)
 		<= 0) {
-		printf(
-			"\nInvalid address/ Address not supported \n");
+		printf("\nInvalid address / Address not supported \n");
 		return -1;
 	}
 
@@ -52,10 +50,12 @@ int main(int argc, char const* argv[])
 		return -1;
 	}
 	send(client_fd, "PLACEHOLDER MESSAGE", strlen("PLACEHOLDER MESSAGE"), 0);
-	printf("Hello message sent\n");
+	printf("Hello message sentC\n");
 	valread = recv(client_fd, buffer, 1024 - 1, 0); // subtract 1 for the null
 	// terminator at the end
 	printf("%s\n", buffer);
+	
+	//Keep server busy here so it doesnt die
 
 	// closing the connected socket
 	closesocket(client_fd);
