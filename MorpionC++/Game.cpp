@@ -20,7 +20,7 @@ void Game::Place() {
 	bool hasPlaced = false;
 	int boxIndex;
 	while (!hasPlaced) {
-		cout << "Player " << currentPlayerTurn << ", enter the index of the box you wwant to play " << endl;
+		cout << "Player " << currentPlayerTurn << ", enter the index of the box you want to play " << endl;
 		cin >> boxIndex;
 		cout << endl;
 

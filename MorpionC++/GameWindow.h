@@ -16,6 +16,7 @@ public:
     sf::CircleShape* oCircle; 
     sf::RectangleShape* oCrossBit1;
     sf::RectangleShape* oCrossBit2;
+    vector <sf::RectangleShape*> gridLines;
 
 
     GameWindow();
