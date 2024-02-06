@@ -1,6 +1,7 @@
 #pragma once
 #include "Grid.h"
 #include "GameWindow.h"
+#include "InputManager.h"
 
 #include <iostream>
 
@@ -10,6 +11,7 @@ class Game
 {
 public:
 	GameWindow* window;
+	InputManager* inputs;
 	Grid* currentGrid;
 	char currentPlayerTurn;
 	bool playing;

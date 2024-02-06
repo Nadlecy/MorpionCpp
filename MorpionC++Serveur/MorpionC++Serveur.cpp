@@ -6,7 +6,9 @@
 #include <iphlpapi.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>+
+#include <string.h>
+#include <vector>
+#include <iostream>
 
 #define PORT 6969
 
@@ -58,25 +60,41 @@ int main(int argc, char const* argv[]) {
         perror("bind failed");
         exit(EXIT_FAILURE);
     }
-    if (listen(server_fd, 3) < 0) {
-        perror("listen");
-        exit(EXIT_FAILURE);
-    }
-    if ((new_socket = accept(server_fd, (struct sockaddr*)&address, &addrlen)) < 0) {
-        perror("accept");
-        exit(EXIT_FAILURE);
-    }
 
-    valread = recv(new_socket, buffer, 1024 - 1, 0); // subtract 1 for the null
-    // terminator at the end
-    printf("%s\n", buffer);
-    send(new_socket, "0X0XX0X00", strlen("0X0XX0X00"), 0);
-    printf("Hello message sent\n");
+    vector<SOCKET> connectedList;
 
+    while (true) {
+        
+        if (listen(server_fd, 3) < 0) {
+            perror("listen");
+            exit(EXIT_FAILURE);
+        }
+        if ((new_socket = accept(server_fd, (struct sockaddr*)&address, &addrlen)) < 0) {
+            perror("accept");
+            exit(EXIT_FAILURE);
+        }
+        else {
+            connectedList.push_back(new_socket);
+
+            send(connectedList[connectedList.size() - 1], "Server says hi", strlen("Server says hi"), 0);
+            std::cout << connectedList[connectedList.size() - 1] <<"\n";
+            printf("Hello message sent\n");
+        }
+        for (int i = 0; i < connectedList.size(); i++) {
+
+            char buffer[1024] = { 0 };
+            valread = recv(connectedList[i], buffer, 1024 - 1, 0); // subtract 1 for the null
+            // terminator at the end
+            printf("%s\n", buffer);
+        }
+
+    }
     // closing the connected socket
     closesocket(new_socket);
 
     // closing the listening socket
     closesocket(server_fd);
+    WSACleanup();
     return 0;
 }
+

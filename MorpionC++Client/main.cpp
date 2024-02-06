@@ -55,9 +55,7 @@ int main(int argc, char const* argv[])
 	// terminator at the end
 	printf("%s\n", buffer);
 	
-	//Keep server busy here so it doesnt die
-
-	// closing the connected socket
+	//Closing the connected socket
 	closesocket(client_fd);
 	return 0;
 }

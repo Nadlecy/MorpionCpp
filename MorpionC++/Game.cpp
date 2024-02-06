@@ -2,9 +2,11 @@
 
 Game::Game() {
 	window = new GameWindow();
+	inputs = new InputManager(window);
 	currentGrid = new Grid();
 	currentPlayerTurn = 'O';
 	playing = true;
+
 }
 
 void Game::ChangeTurn() {
