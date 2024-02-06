@@ -16,11 +16,15 @@ void InputManager::EventCheck() {
 			Window->oWindow->close();
 		}
 
-		else if (oEvent.type == sf::Event::MouseButtonReleased) {
+		else if (oEvent.type == sf::Event::MouseButtonPressed) {
 			if (oEvent.mouseButton.button == sf::Mouse::Left) {
-				sf::Vector2i position = sf::Mouse::getPosition(*Window->oWindow);
-				std::cout << position.x  << endl;
-				std::cout << position.y << endl;
+
+				mouseX = oEvent.mouseButton.x;
+				mouseY = oEvent.mouseButton.y;
+
+				std::cout << "the right button was pressed" << std::endl;
+				std::cout << "mouse x: " << mouseX << std::endl;
+				std::cout << "mouse y: " << mouseY << std::endl;
 			}
 		}
 	}

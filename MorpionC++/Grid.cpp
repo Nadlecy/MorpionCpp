@@ -12,9 +12,9 @@ Grid::Grid() {
 void Grid::Display() {
 	for (int line = 0; line < 3; line++) {
 		for (int column = 0; column < 3; column++) {
-			cout << boxList[line * 3 + column]->GetValue();
+			//cout << boxList[line * 3 + column]->GetValue();
 		}
-		cout << endl;
+		//cout << endl;
 	}
 }
 

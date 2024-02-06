@@ -82,6 +82,9 @@ void Game::Reset() {
 
 void Game::Play() {
 	while (true) {
+
+		inputs->EventCheck();
+
 		//Checking if there is still room to play.
 		if (currentGrid->IsFull()) {
 			End(' ');
@@ -105,5 +108,5 @@ void Game::Play() {
 		//Switching turns.
 		ChangeTurn();
 	}
-	playing = AskReplay();
+	//playing = AskReplay();
 }
