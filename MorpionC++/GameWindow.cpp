@@ -73,7 +73,6 @@ void GameWindow::Display(Grid* grid) {
 				DrawCross(column, line);
 			}
 		}
-		//cout << endl;
 	}
 
     //Updates the window.

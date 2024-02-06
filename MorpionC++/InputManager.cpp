@@ -15,17 +15,18 @@ void InputManager::EventCheck() {
 		if (oEvent.type == sf::Event::Closed || sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
 			Window->oWindow->close();
 		}
+	}
+}
 
-		else if (oEvent.type == sf::Event::MouseButtonPressed) {
-			if (oEvent.mouseButton.button == sf::Mouse::Left) {
+bool InputManager::Event() {
+	if (oEvent.type == sf::Event::MouseButtonReleased) {
+		if (oEvent.mouseButton.button == sf::Mouse::Left) {
 
-				mouseX = oEvent.mouseButton.x;
-				mouseY = oEvent.mouseButton.y;
+			mouseX = (oEvent.mouseButton.x - 100) / (Window->windowH / 3); // a modifier le 100 pour rendre la page responsive ( car il y a des bords a gauche et a droit qu'il ne faut pas compter)
+			mouseY = oEvent.mouseButton.y / (Window->windowH / 3) * 3;
 
-				std::cout << "the right button was pressed" << std::endl;
-				std::cout << "mouse x: " << mouseX << std::endl;
-				std::cout << "mouse y: " << mouseY << std::endl;
-			}
+			return true;
 		}
 	}
+	return false;
 }

@@ -20,13 +20,14 @@ void Game::ChangeTurn() {
 
 void Game::Place() {
 	bool hasPlaced = false;
-	int boxIndex;
-	while (!hasPlaced) {
-		cout << "Player " << currentPlayerTurn << ", enter the index of the box you want to play " << endl;
-		cin >> boxIndex;
-		cout << endl;
+	int boxIndex = inputs->mouseX + inputs->mouseY;
 
-		cin.clear();
+	while (!hasPlaced) {
+		//cout << "Player " << currentPlayerTurn << ", enter the index of the box you want to play " << endl;
+		//cin >> boxIndex;
+		//cout << endl;
+
+		//cin.clear();
 
 		if (boxIndex < 0 || boxIndex > 8) {
 			cout << "Please enter a valid number!";
@@ -85,18 +86,15 @@ void Game::Play() {
 
 		inputs->EventCheck();
 
+		//Showing the grid
+		window->Display(currentGrid);
+		currentGrid->Display();
+
 		//Checking if there is still room to play.
 		if (currentGrid->IsFull()) {
 			End(' ');
 			break;
 		}
-
-		//Showing the grid
-		window->Display(currentGrid);
-		currentGrid->Display();
-
-		//Asking where the current player wants to play.
-		Place();
 
 		//A victory check happens at the end of every turn, so the moment the WinCheck succeeds, the current player is logically the winner.
 		if (currentGrid->WinCheck() != ' ') {
@@ -105,8 +103,17 @@ void Game::Play() {
 			break;
 		}
 
-		//Switching turns.
-		ChangeTurn();
+		if (inputs->Event()) {
+
+			//Asking where the current player wants to play.
+			Place();
+
+			//Switching turns.
+			ChangeTurn();
+
+			inputs->mouseX = NULL;
+			inputs->mouseX = NULL;
+		}
 	}
-	//playing = AskReplay();
+	playing = AskReplay();
 }
