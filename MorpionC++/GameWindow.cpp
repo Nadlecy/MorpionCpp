@@ -60,6 +60,8 @@ void GameWindow::DrawCross(int posX, int posY) {
 }
 
 void GameWindow::Display(Grid* grid) {
+	oWindow->clear();
+
 	for (int i = 0; i < 4; i++) {
 		oWindow->draw(*gridLines[i]);
 	}

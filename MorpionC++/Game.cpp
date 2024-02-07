@@ -20,15 +20,11 @@ void Game::ChangeTurn() {
 
 void Game::Place() {
 	bool hasPlaced = false;
-	int boxIndex = inputs->mouseX + inputs->mouseY;
+	int boxIndex;
 
 	while (!hasPlaced) {
-		//cout << "Player " << currentPlayerTurn << ", enter the index of the box you want to play " << endl;
-		//cin >> boxIndex;
-		//cout << endl;
-
-		//cin.clear();
-
+		boxIndex = inputs->mouseX + inputs->mouseY;
+		
 		if (boxIndex < 0 || boxIndex > 8) {
 			cout << "Please enter a valid number!";
 			continue;
@@ -103,7 +99,7 @@ void Game::Play() {
 			break;
 		}
 
-		if (inputs->Event()) {
+		if (inputs->EventCheck()) {
 
 			//Asking where the current player wants to play.
 			Place();
@@ -113,6 +109,7 @@ void Game::Play() {
 
 			inputs->mouseX = NULL;
 			inputs->mouseX = NULL;
+
 		}
 	}
 	playing = AskReplay();

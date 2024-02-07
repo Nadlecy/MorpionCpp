@@ -12,8 +12,6 @@ public:
 
 	InputManager(GameWindow* window);
 
-	void EventCheck();
-
-	bool Event();
+	bool EventCheck();
 };
 

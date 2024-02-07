@@ -1,288 +1,124 @@
-// WindowsProject1.cpp : Définit le point d'entrée de l'application.
-//
-
-#include "framework.h"
-#include "MorpionC++Serveur.h"
-#pragma comment(lib, "ws2_32.lib")
-
 #include <winsock2.h>
 #include <windows.h>
-#include <ws2tcpip.h>
-#include <iphlpapi.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <vector>
-#include <iostream>
 
 #define PORT 6969
+#define WM_SOCKET WM_USER + 1
+#pragma comment(lib, "ws2_32.lib")
 
-#define MAX_LOADSTRING 100
+LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-// Variables globales :
-HINSTANCE hInst;                                // instance actuelle
-WCHAR szTitle[MAX_LOADSTRING];                  // Texte de la barre de titre
-WCHAR szWindowClass[MAX_LOADSTRING];            // nom de la classe de fenêtre principale
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
 
-// Déclarations anticipées des fonctions incluses dans ce module de code :
-ATOM                MyRegisterClass(HINSTANCE hInstance);
-BOOL                InitInstance(HINSTANCE, int);
-LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
-INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
-
-int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-	_In_opt_ HINSTANCE hPrevInstance,
-	_In_ LPWSTR    lpCmdLine,
-	_In_ int       nCmdShow)
-{
-	UNREFERENCED_PARAMETER(hPrevInstance);
-	UNREFERENCED_PARAMETER(lpCmdLine);
-
-	// TODO: Placez le code ici.
-
-	// Initialise les chaînes globales
-	LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
-	LoadStringW(hInstance, IDC_MORPION, szWindowClass, MAX_LOADSTRING);
-	MyRegisterClass(hInstance);
-
-	// Effectue l'initialisation de l'application :
-	if (!InitInstance(hInstance, nCmdShow))
-	{
-		return FALSE;
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////
-	//START OF OUR CODE_____________________________________________________mettre le code ici//
-	////////////////////////////////////////////////////////////////////////////////////////////
-
-	int server_fd, new_socket;
-	size_t valread;
-	struct sockaddr_in address;
-	int opt = 1;
-	socklen_t addrlen = sizeof(address);
-	char buffer[1024] = { 0 };
-
-	WORD wVersionRequested;
+	// Initialize Winsock
 	WSADATA wsaData;
-	int err;
-
-	/* Use the MAKEWORD(lowbyte, highbyte) macro declared in Windef.h */
-	wVersionRequested = MAKEWORD(2, 2);
-
-	err = WSAStartup(wVersionRequested, &wsaData);
-	if (err != 0) {
-		/* Tell the user that we could not find a usable */
-		/* Winsock DLL.                                  */
-		printf("WSAStartup failed with error: %d\n", err);
+	int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
+	if (iResult != 0) {
+		MessageBox(NULL, L"WSAStartup failed", L"Error", MB_OK | MB_ICONERROR);
 		return 1;
 	}
 
-	// Creating socket file descriptor
-	if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-		perror("socket failed");
-		exit(EXIT_FAILURE);
+	// Create a socket
+	SOCKET serverSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	int newSocket;
+	if (serverSocket == INVALID_SOCKET) {
+		MessageBox(NULL, L"socket failed", L"Error", MB_OK | MB_ICONERROR);
+		WSACleanup();
+		return 1;
 	}
 
-	// Forcefully attaching socket to the port 6969
-	if (setsockopt(server_fd, SOL_SOCKET,
-		SO_REUSEADDR, (char*)&opt,
-		sizeof(opt))) {
-		perror("setsockopt");
-		exit(EXIT_FAILURE);
+	// Create a window
+	HWND hwnd;
+	WNDCLASSEX wc;
+	ZeroMemory(&wc, sizeof(WNDCLASSEX));
+	wc.cbSize = sizeof(WNDCLASSEX);
+	wc.style = CS_HREDRAW | CS_VREDRAW;
+	wc.lpfnWndProc = WindowProc;
+	wc.hInstance = hInstance;
+	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+	wc.hbrBackground = (HBRUSH)COLOR_WINDOW;
+	wc.lpszClassName = L"ServerWindowClass";
+	RegisterClassEx(&wc);
+	hwnd = CreateWindowEx(0, L"ServerWindowClass", L"Server Window", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 800, 600, NULL, NULL, hInstance, NULL);
+	if (hwnd == NULL) {
+		MessageBox(NULL, L"Window creation failed", L"Error", MB_OK | MB_ICONERROR);
+		return 1;
 	}
 
-	address.sin_family = AF_INET;
-	address.sin_addr.s_addr = INADDR_ANY;
-	address.sin_port = htons(PORT);
+	// Bind the socket
+	SOCKADDR_IN serverAddr;
+	int addrlen = sizeof(serverAddr);
+	size_t valread;
 
-	// Forcefully attaching socket to the port 6969
-	if (bind(server_fd, (struct sockaddr*)&address, sizeof(address)) < 0) {
-		perror("bind failed");
-		exit(EXIT_FAILURE);
+	serverAddr.sin_family = AF_INET;
+	serverAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+	serverAddr.sin_port = htons(PORT); // You can change the port number
+	if (bind(serverSocket, (SOCKADDR*)&serverAddr, addrlen) == SOCKET_ERROR) {
+		MessageBox(NULL, L"bind failed", L"Error", MB_OK | MB_ICONERROR);
+		closesocket(serverSocket);
+		WSACleanup();
+		return 1;
 	}
 
-	std::vector<SOCKET> connectedList;
+	// Listen on the socket
+	if (listen(serverSocket, SOMAXCONN) == SOCKET_ERROR) {
+		MessageBox(NULL, L"listen failed", L"Error", MB_OK | MB_ICONERROR);
+		closesocket(serverSocket);
+		WSACleanup();
+		return 1;
+	}
 
-	while (true) {
-
-		if (listen(server_fd, 3) < 0) {
-			perror("listen");
-			exit(EXIT_FAILURE);
-		}
-		if ((new_socket = accept(server_fd, (struct sockaddr*)&address, &addrlen)) < 0) {
-			perror("accept");
-			exit(EXIT_FAILURE);
-		}
-		else {
-			connectedList.push_back(new_socket);
-
-			send(connectedList[connectedList.size() - 1], "Server says hi", strlen("Server says hi"), 0);
-			std::cout << connectedList[connectedList.size() - 1] << "\n";
-			printf("Hello message sent\n");
-		}
-		for (int i = 0; i < connectedList.size(); i++) {
-
-			char buffer[1024] = { 0 };
-			valread = recv(connectedList[i], buffer, 1024 - 1, 0); // subtract 1 for the null
-			// terminator at the end
-			printf("%s\n", buffer);
-		}
-
-	}/*
-	// closing the connected socket
-	closesocket(new_socket);
-
-	// closing the listening socket
-	closesocket(server_fd);
-	WSACleanup();*/
+	// faire un select
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////
-	//END OF OUR CODE__________________________________________________________fin du code ici//
-	////////////////////////////////////////////////////////////////////////////////////////////
-	
-	HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_MORPION));
 
+
+	ShowWindow(hwnd, nCmdShow);
+	UpdateWindow(hwnd);
+
+	// Message loop
 	MSG msg;
-
-	// Boucle de messages principale :
-	while (GetMessage(&msg, nullptr, 0, 0))
-	{
-		if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
-		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
+	while (GetMessage(&msg, NULL, 0, 0)) {
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
 	}
 
-	// closing the connected socket
-	closesocket(new_socket);
-
-	// closing the listening socket
-	closesocket(server_fd);
+	// Cleanup
+	closesocket(serverSocket);
 	WSACleanup();
+
 	return (int)msg.wParam;
 }
 
-
-
-//
-//  FONCTION : MyRegisterClass()
-//
-//  OBJECTIF : Inscrit la classe de fenêtre.
-//
-ATOM MyRegisterClass(HINSTANCE hInstance)
-{
-	WNDCLASSEXW wcex;
-
-	wcex.cbSize = sizeof(WNDCLASSEX);
-
-	wcex.style = CS_HREDRAW | CS_VREDRAW;
-	wcex.lpfnWndProc = WndProc;
-	wcex.cbClsExtra = 0;
-	wcex.cbWndExtra = 0;
-	wcex.hInstance = hInstance;
-	wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_MORPION));
-	wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
-	wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-	wcex.lpszMenuName = MAKEINTRESOURCEW(IDC_MORPION);
-	wcex.lpszClassName = szWindowClass;
-	wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
-
-	return RegisterClassExW(&wcex);
-}
-
-//
-//   FONCTION : InitInstance(HINSTANCE, int)
-//
-//   OBJECTIF : enregistre le handle d'instance et crée une fenêtre principale
-//
-//   COMMENTAIRES :
-//
-//        Dans cette fonction, nous enregistrons le handle de l'instance dans une variable globale, puis
-//        nous créons et affichons la fenêtre principale du programme.
-//
-BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
-{
-	hInst = hInstance; // Stocke le handle d'instance dans la variable globale
-
-	HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
-
-	if (!hWnd)
+LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,int newSocket, SOCKET serverSocket, SOCKADDR_IN serverAddr, int addrlen) {
+	switch (uMsg)
 	{
-		return FALSE;
-	}
-
-	ShowWindow(hWnd, nCmdShow);
-	UpdateWindow(hWnd);
-
-	return TRUE;
-}
-
-//
-//  FONCTION : WndProc(HWND, UINT, WPARAM, LPARAM)
-//
-//  OBJECTIF : Traite les messages pour la fenêtre principale.
-//
-//  WM_COMMAND  - traite le menu de l'application
-//  WM_PAINT    - Dessine la fenêtre principale
-//  WM_DESTROY  - génère un message d'arrêt et retourne
-//
-//
-LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	switch (message)
-	{
-	case WM_COMMAND:
-	{
-		int wmId = LOWORD(wParam);
-		// Analyse les sélections de menu :
-		switch (wmId)
-		{
-		case IDM_ABOUT:
-			DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
-			break;
-		case IDM_EXIT:
-			DestroyWindow(hWnd);
-			break;
-		default:
-			return DefWindowProc(hWnd, message, wParam, lParam);
-		}
-	}
-	break;
 	case WM_PAINT:
-	{
-		PAINTSTRUCT ps;
-		HDC hdc = BeginPaint(hWnd, &ps);
-		// TODO: Ajoutez ici le code de dessin qui utilise hdc...
-		EndPaint(hWnd, &ps);
-	}
-	break;
-	case WM_DESTROY:
-		PostQuitMessage(0);
+		// Process window paint message
 		break;
-	default:
-		return DefWindowProc(hWnd, message, wParam, lParam);
+	case WM_SOCKET:
+		// Determine whether an error occurred on the
+		// socket by using the WSAGETSELECTERROR() macro
+		if (WSAGETSELECTERROR(lParam))
+		{
+			// Display the error and close the socke
+			closesocket((SOCKET)wParam);
+			break;
+		}
+		// Determine what event occurred on the socket
+		switch (WSAGETSELECTEVENT(lParam))
+		{
+		case FD_ACCEPT:
+			// Accept an incoming connection
+			newSocket = accept(serverSocket, (SOCKADDR*)&serverAddr, &addrlen);
+			// Prepare accepted socket for read, write, and close notification
+			WSAAsyncSelect(newSocket, hwnd, WM_SOCKET, FD_READ | FD_WRITE | FD_CLOSE);
+			send(newSocket, "Server says hi 2", (int)strlen("Server says hi 2"), 0);
+			break;
+		case FD_READ:
+			// Receive data from the socket in wParam
+			break;
+		}
+		break;
 	}
 	return 0;
-}
-
-// Gestionnaire de messages pour la boîte de dialogue À propos de.
-INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	UNREFERENCED_PARAMETER(lParam);
-	switch (message)
-	{
-	case WM_INITDIALOG:
-		return (INT_PTR)TRUE;
-
-	case WM_COMMAND:
-		if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
-		{
-			EndDialog(hDlg, LOWORD(wParam));
-			return (INT_PTR)TRUE;
-		}
-		break;
-	}
-	return (INT_PTR)FALSE;
 }
