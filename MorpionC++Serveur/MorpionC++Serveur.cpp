@@ -1,9 +1,14 @@
 #include <winsock2.h>
 #include <windows.h>
+#include <stdio.h>
+#include <iostream>
 
 #define PORT 6969
 #define WM_SOCKET WM_USER + 1
+
 #pragma comment(lib, "ws2_32.lib")
+
+using namespace std;
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -90,6 +95,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 }
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,int newSocket, SOCKET serverSocket, SOCKADDR_IN serverAddr, int addrlen) {
+
+	SOCKET SocketInfo;
+	WSABUF dataBuf;
+	DWORD RecvBytes;
+	DWORD Flags = 0;
+	char recvBuffer[512];
+	dataBuf.buf = recvBuffer;
+	dataBuf.len = 512;
+
 	switch (uMsg)
 	{
 	case WM_PAINT:
@@ -111,11 +125,27 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,i
 			// Accept an incoming connection
 			newSocket = accept(serverSocket, (SOCKADDR*)&serverAddr, &addrlen);
 			// Prepare accepted socket for read, write, and close notification
-			WSAAsyncSelect(newSocket, hwnd, WM_SOCKET, FD_READ | FD_WRITE | FD_CLOSE);
+			WSAAsyncSelect(newSocket, hwnd, WM_SOCKET, FD_READ);
 			send(newSocket, "Server says hi 2", (int)strlen("Server says hi 2"), 0);
 			break;
 		case FD_READ:
-			// Receive data from the socket in wParam
+
+			SocketInfo = wParam;
+
+			if (WSARecv(SocketInfo, &dataBuf, 1, &RecvBytes, &Flags, NULL, NULL) == SOCKET_ERROR)
+			{
+				if (WSAGetLastError() != WSAEWOULDBLOCK)
+				{
+					printf("WSARecv() failed with error %d\n", WSAGetLastError());
+					closesocket(SocketInfo);
+					return 0;
+				}
+			}
+			else {
+				wstring message(recvBuffer, recvBuffer + RecvBytes / sizeof(wchar_t));
+				MessageBox(hwnd, message.c_str(), L"Notification", MB_OK | MB_ICONINFORMATION);
+
+			}
 			break;
 		}
 		break;
