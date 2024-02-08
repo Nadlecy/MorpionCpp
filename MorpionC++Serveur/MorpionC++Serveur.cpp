@@ -4,7 +4,7 @@
 #include <iostream>
 
 #define PORT 6969
-#define WM_SOCKET WM_USER + 1
+//#define WM_SOCKET WM_USER + 1
 
 #pragma comment(lib, "ws2_32.lib")
 
@@ -12,7 +12,30 @@ using namespace std;
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
+
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
+
+	//MyRegisterClass(hInstance);
+
+
+	// Create a window
+	HWND hwnd;
+	WNDCLASSEX wc;
+	ZeroMemory(&wc, sizeof(WNDCLASSEX));
+	wc.cbSize = sizeof(WNDCLASSEX);
+	wc.style = CS_HREDRAW | CS_VREDRAW;
+	wc.lpfnWndProc = WindowProc;
+	wc.hInstance = hInstance;    
+	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+	wc.hbrBackground = (HBRUSH)COLOR_WINDOW;
+	wc.lpszClassName = L"ServerWindowClass";
+	RegisterClassEx(&wc);
+	hwnd = CreateWindowEx(0, L"ServerWindowClass", L"Server Window", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 800, 600, nullptr, nullptr, hInstance, nullptr);
+
+	if (hwnd == NULL)
+	{
+		return FALSE;
+	}
 
 	// Initialize Winsock
 	WSADATA wsaData;
@@ -31,26 +54,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		return 1;
 	}
 
-	// Create a window
-	HWND hwnd;
-	WNDCLASSEX wc;
-	ZeroMemory(&wc, sizeof(WNDCLASSEX));
-	wc.cbSize = sizeof(WNDCLASSEX);
-	wc.style = CS_HREDRAW | CS_VREDRAW;
-	wc.lpfnWndProc = WindowProc;
-	wc.hInstance = hInstance;
-	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-	wc.hbrBackground = (HBRUSH)COLOR_WINDOW;
-	wc.lpszClassName = L"ServerWindowClass";
-	RegisterClassEx(&wc);
-	hwnd = CreateWindowEx(0, L"ServerWindowClass", L"Server Window", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 800, 600, NULL, NULL, hInstance, NULL);
-	if (hwnd == NULL) {
-		MessageBox(NULL, L"Window creation failed", L"Error", MB_OK | MB_ICONERROR);
-		return 1;
-	}
-
 	// Bind the socket
 	SOCKADDR_IN serverAddr;
+	WSAAsyncSelect(serverSocket, hwnd, WM_USER + 1, FD_ACCEPT | FD_READ | FD_CLOSE);
 	int addrlen = sizeof(serverAddr);
 	size_t valread;
 
@@ -64,6 +70,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		return 1;
 	}
 
+	if (hwnd == NULL) {
+		MessageBox(NULL, L"Window creation failed", L"Error", MB_OK | MB_ICONERROR);
+		return 1;
+	}
+
 	// Listen on the socket
 	if (listen(serverSocket, SOMAXCONN) == SOCKET_ERROR) {
 		MessageBox(NULL, L"listen failed", L"Error", MB_OK | MB_ICONERROR);
@@ -72,19 +83,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		return 1;
 	}
 
-	// faire un select
-
-
-
-
+	// Show the Window
 	ShowWindow(hwnd, nCmdShow);
-	UpdateWindow(hwnd);
 
 	// Message loop
 	MSG msg;
+
 	while (GetMessage(&msg, NULL, 0, 0)) {
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
+		UpdateWindow(hwnd);
 	}
 
 	// Cleanup
@@ -94,9 +102,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	return (int)msg.wParam;
 }
 
-LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,int newSocket, SOCKET serverSocket, SOCKADDR_IN serverAddr, int addrlen) {
+LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
 	SOCKET SocketInfo;
+	SOCKET newSocket;
 	WSABUF dataBuf;
 	DWORD RecvBytes;
 	DWORD Flags = 0;
@@ -107,29 +116,35 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,i
 	switch (uMsg)
 	{
 	case WM_PAINT:
-		// Process window paint message
-		break;
-	case WM_SOCKET:
-		// Determine whether an error occurred on the
-		// socket by using the WSAGETSELECTERROR() macro
-		if (WSAGETSELECTERROR(lParam))
-		{
-			// Display the error and close the socke
-			closesocket((SOCKET)wParam);
-			break;
-		}
+	{
+		PAINTSTRUCT ps;
+		HDC hdc = BeginPaint(hwnd, &ps);
+
+		// All painting occurs here, between BeginPaint and EndPaint.
+
+		FillRect(hdc, &ps.rcPaint, (HBRUSH)(COLOR_WINDOW + 1));
+
+		EndPaint(hwnd, &ps);
+	}
+
+	case WM_USER + 1:
 		// Determine what event occurred on the socket
 		switch (WSAGETSELECTEVENT(lParam))
 		{
 		case FD_ACCEPT:
 			// Accept an incoming connection
-			newSocket = accept(serverSocket, (SOCKADDR*)&serverAddr, &addrlen);
+			newSocket = accept(wParam, NULL, NULL);
 			// Prepare accepted socket for read, write, and close notification
-			WSAAsyncSelect(newSocket, hwnd, WM_SOCKET, FD_READ);
-			send(newSocket, "Server says hi 2", (int)strlen("Server says hi 2"), 0);
+			WSAAsyncSelect(newSocket, hwnd, WM_USER + 1, FD_READ | FD_CLOSE);
+			send(newSocket, "Connect to server", (int)strlen("Connect to server"), 0);
 			break;
-		case FD_READ:
 
+		case FD_CLOSE:
+			closesocket((SOCKET)wParam);
+			break;
+
+		case FD_READ:
+			
 			SocketInfo = wParam;
 
 			if (WSARecv(SocketInfo, &dataBuf, 1, &RecvBytes, &Flags, NULL, NULL) == SOCKET_ERROR)
@@ -142,13 +157,13 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,i
 				}
 			}
 			else {
-				wstring message(recvBuffer, recvBuffer + RecvBytes / sizeof(wchar_t));
+				system("pause");
+				wstring message(recvBuffer, recvBuffer + RecvBytes);
 				MessageBox(hwnd, message.c_str(), L"Notification", MB_OK | MB_ICONINFORMATION);
-
+				send(SocketInfo, "Connect to server 3", (int)strlen("Connect to server 3"), 0);
 			}
 			break;
 		}
 		break;
 	}
-	return 0;
 }
