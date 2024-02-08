@@ -131,6 +131,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 		// Determine what event occurred on the socket
 		switch (WSAGETSELECTEVENT(lParam))
 		{
+		//When a new connection is detected
 		case FD_ACCEPT:
 			// Accept an incoming connection
 			newSocket = accept(wParam, NULL, NULL);
@@ -139,10 +140,12 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 			send(newSocket, "Connect to server", (int)strlen("Connect to server"), 0);
 			break;
 
+		//when a CONNECTED SOCKET is closed, not the server.
 		case FD_CLOSE:
 			closesocket((SOCKET)wParam);
 			break;
-
+		
+		//when a connected socket sends a message
 		case FD_READ:
 			
 			SocketInfo = wParam;
