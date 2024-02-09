@@ -22,7 +22,7 @@ void ServerData::NewPlayer(string playerName) {
 }
 
 
-/* JSON for new player be like : 
+/* JSON for new player should be like : 
 
 {
 	"username" : playerName (string)
