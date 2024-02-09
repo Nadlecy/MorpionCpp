@@ -82,7 +82,7 @@ int main()
 
 	// Convert IPv4 and IPv6 addresses from text to binary
 	// form
-	if (inet_pton(AF_INET, "10.1.144.26", &serv_addr.sin_addr)
+	if (inet_pton(AF_INET, "192.168.1.152", &serv_addr.sin_addr)
 		<= 0) {
 		MessageBox(NULL, L"Invalid address / Address not supported", L"Error", MB_OK | MB_ICONERROR);
 		return -1;
