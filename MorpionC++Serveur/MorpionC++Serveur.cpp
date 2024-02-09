@@ -13,24 +13,31 @@ using namespace std;
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
-
-	//MyRegisterClass(hInstance);
-
+//int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
+int main()
+{
+	HINSTANCE hInstance = GetModuleHandle(0);
 
 	// Create a window
-	HWND hwnd;
+
 	WNDCLASSEX wc;
 	ZeroMemory(&wc, sizeof(WNDCLASSEX));
 	wc.cbSize = sizeof(WNDCLASSEX);
 	wc.style = CS_HREDRAW | CS_VREDRAW;
 	wc.lpfnWndProc = WindowProc;
 	wc.hInstance = hInstance;    
-	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-	wc.hbrBackground = (HBRUSH)COLOR_WINDOW;
+	wc.hCursor = 0;
+	wc.hbrBackground = 0;
 	wc.lpszClassName = L"ServerWindowClass";
-	RegisterClassEx(&wc);
-	hwnd = CreateWindowEx(0, L"ServerWindowClass", L"Server Window", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 800, 600, nullptr, nullptr, hInstance, nullptr);
+	wc.cbClsExtra = 0;
+	wc.cbWndExtra = 0;
+	wc.hIcon = 0;
+	wc.lpszMenuName = 0;
+	wc.hIconSm = 0;
+	ATOM res = RegisterClassEx(&wc);
+
+	HWND hwnd;
+	hwnd = CreateWindowEx(0, L"ServerWindowClass", L"", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 800, 600, nullptr, nullptr, hInstance, nullptr);
 
 	if (hwnd == NULL)
 	{
@@ -84,7 +91,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	}
 
 	// Show the Window
-	ShowWindow(hwnd, nCmdShow);
+	//ShowWindow(hwnd, nCmdShow);
 
 	// Message loop
 	MSG msg;
@@ -92,7 +99,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	while (GetMessage(&msg, NULL, 0, 0)) {
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
-		UpdateWindow(hwnd);
 	}
 
 	// Cleanup
@@ -115,58 +121,52 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 
 	switch (uMsg)
 	{
-	case WM_PAINT:
-	{
-		PAINTSTRUCT ps;
-		HDC hdc = BeginPaint(hwnd, &ps);
-
-		// All painting occurs here, between BeginPaint and EndPaint.
-
-		FillRect(hdc, &ps.rcPaint, (HBRUSH)(COLOR_WINDOW + 1));
-
-		EndPaint(hwnd, &ps);
-	}
-
-	case WM_USER + 1:
-		// Determine what event occurred on the socket
-		switch (WSAGETSELECTEVENT(lParam))
+		case WM_USER + 1:
 		{
-		//When a new connection is detected
-		case FD_ACCEPT:
-			// Accept an incoming connection
-			newSocket = accept(wParam, NULL, NULL);
-			// Prepare accepted socket for read, write, and close notification
-			WSAAsyncSelect(newSocket, hwnd, WM_USER + 1, FD_READ | FD_CLOSE);
-			send(newSocket, "Connect to server", (int)strlen("Connect to server"), 0);
-			break;
-
-		//when a CONNECTED SOCKET is closed, not the server.
-		case FD_CLOSE:
-			closesocket((SOCKET)wParam);
-			break;
-		
-		//when a connected socket sends a message
-		case FD_READ:
-			
-			SocketInfo = wParam;
-
-			if (WSARecv(SocketInfo, &dataBuf, 1, &RecvBytes, &Flags, NULL, NULL) == SOCKET_ERROR)
+			// Determine what event occurred on the socket
+			switch (WSAGETSELECTEVENT(lParam))
 			{
-				if (WSAGetLastError() != WSAEWOULDBLOCK)
+				//When a new connection is detected
+			case FD_ACCEPT:
+				// Accept an incoming connection
+				newSocket = accept(wParam, NULL, NULL);
+				// Prepare accepted socket for read, write, and close notification
+				WSAAsyncSelect(newSocket, hwnd, WM_USER + 1, FD_READ | FD_CLOSE);
+				send(newSocket, "Connect to server", (int)strlen("Connect to server"), 0);
+				cout << "client connected\n";
+				break;
+
+				//when a CONNECTED SOCKET is closed, not the server.
+			case FD_CLOSE:
+				cout << "client connection end\n";
+				closesocket((SOCKET)wParam);
+				break;
+
+				//when a connected socket sends a message
+			case FD_READ:
+
+				SocketInfo = wParam;
+
+				if (WSARecv(SocketInfo, &dataBuf, 1, &RecvBytes, &Flags, NULL, NULL) == SOCKET_ERROR)
 				{
-					printf("WSARecv() failed with error %d\n", WSAGetLastError());
-					closesocket(SocketInfo);
-					return 0;
+					if (WSAGetLastError() != WSAEWOULDBLOCK)
+					{
+						printf("WSARecv() failed with error %d\n", WSAGetLastError());
+						closesocket(SocketInfo);
+						return 0;
+					}
 				}
+				else {
+					system("pause");
+					wstring message(recvBuffer, recvBuffer + RecvBytes);
+					MessageBox(hwnd, message.c_str(), L"Notification", MB_OK | MB_ICONINFORMATION);
+					send(SocketInfo, "Connect to server 3", (int)strlen("Connect to server 3"), 0);
+				}
+				break;
 			}
-			else {
-				system("pause");
-				wstring message(recvBuffer, recvBuffer + RecvBytes);
-				MessageBox(hwnd, message.c_str(), L"Notification", MB_OK | MB_ICONINFORMATION);
-				send(SocketInfo, "Connect to server 3", (int)strlen("Connect to server 3"), 0);
-			}
+			return 0;
 			break;
 		}
-		break;
 	}
+	return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
