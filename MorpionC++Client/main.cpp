@@ -6,6 +6,7 @@
 #include <iphlpapi.h>
 #include <stdio.h>
 #include <iostream>
+#include <string>
 
 #define PORT 6969
 #define DATA_BUFSIZE 8192
@@ -88,7 +89,7 @@ int main()
 	}
 
 	SOCKET clientSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-	//WSAAsyncSelect(serverSocket, NULL, WM_USER + 1, FD_ACCEPT | FD_READ | FD_CLOSE);
+	WSAAsyncSelect(clientSocket, hwnd, WM_SOCKET, FD_READ | FD_WRITE | FD_CLOSE);
 	if ((status = connect(client_fd, (struct sockaddr*)&serv_addr, sizeof(serv_addr))) < 0) {
 		MessageBox(NULL, L"Connection Failed", L"Error", MB_OK | MB_ICONERROR);
 		return -1;
@@ -99,8 +100,19 @@ int main()
 		return 1;
 	}
 
-	// Show the Window
+	//Show the Window
 	//ShowWindow(hwnd, nCmdShow);
+
+	// assigning value to string s
+	string s;
+	cout << "message here: " << endl;
+	getline(cin, s);
+	cout << endl;
+
+	const char* tmp = s.c_str();
+	send(client_fd, tmp, strlen(tmp), 0);
+	printf("Hello message sentC\n");
+	printf("%s\n", buffer);
 
 	// Message loop
 	MSG msg;
@@ -108,6 +120,7 @@ int main()
 	while (GetMessage(&msg, NULL, 0, 0)) {
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
+		//Ajouter fonction de jeu (et le send)
 	}
 
 	// Cleanup
@@ -179,8 +192,6 @@ LPSOCKET_INFORMATION GetSocketInformation(SOCKET s)
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 {
-
-	SOCKET Accept;
 	LPSOCKET_INFORMATION SocketInfo;
 	DWORD RecvBytes;
 	DWORD SendBytes;
@@ -197,22 +208,6 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			printf("Socket looks fine!\n");
 			switch (WSAGETSELECTEVENT(lParam)) {
-			case FD_ACCEPT:
-				if ((Accept = accept(wParam, NULL, NULL)) == INVALID_SOCKET)
-				{
-					printf("accept() failed with error %d\n", WSAGetLastError());
-					break;
-				}
-				else {
-					printf("accept() is OK!\n");
-
-					// Create a socket information structure to associate with the socket for processing I/O
-					CreateSocketInformation(Accept);
-					printf("Socket number %d connected\n", Accept);
-					WSAAsyncSelect(Accept, hwnd, WM_SOCKET, FD_READ | FD_WRITE | FD_CLOSE);
-					break;
-				}
-
 			case FD_READ:
 				SocketInfo = GetSocketInformation(wParam);
 				// Read data only if the receive buffer is empty
@@ -240,41 +235,6 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					{
 						printf("WSARecv() is OK!\n");
 						SocketInfo->BytesRECV = RecvBytes;
-					}
-				}
-				// DO NOT BREAK HERE SINCE WE GOT A SUCCESSFUL RECV. Go ahead
-				// and begin writing data to the client
-			case FD_WRITE:
-				SocketInfo = GetSocketInformation(wParam);
-				if (SocketInfo->BytesRECV > SocketInfo->BytesSEND)
-				{
-					SocketInfo->DataBuf.buf = SocketInfo->Buffer + SocketInfo->BytesSEND;
-					SocketInfo->DataBuf.len = SocketInfo->BytesRECV - SocketInfo->BytesSEND;
-					if (WSASend(SocketInfo->Socket, &(SocketInfo->DataBuf), 1, &SendBytes, 0,
-						NULL, NULL) == SOCKET_ERROR)
-					{
-						if (WSAGetLastError() != WSAEWOULDBLOCK)
-						{
-							printf("WSASend() failed with error %d\n", WSAGetLastError());
-							FreeSocketInformation(wParam);
-							return 0;
-						}
-					}
-					else // No error so update the byte count
-					{
-						printf("WSASend() is OK!\n");
-						SocketInfo->BytesSEND += SendBytes;
-					}
-				}
-				if (SocketInfo->BytesSEND == SocketInfo->BytesRECV)
-				{
-					SocketInfo->BytesSEND = 0;
-					SocketInfo->BytesRECV = 0;
-					// If a RECV occurred during our SENDs then we need to post an FD_READ notification on the socket
-					if (SocketInfo->RecvPosted == TRUE)
-					{
-						SocketInfo->RecvPosted = FALSE;
-						PostMessage(hwnd, WM_SOCKET, wParam, FD_READ);
 					}
 				}
 				break;

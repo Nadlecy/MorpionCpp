@@ -132,7 +132,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 				newSocket = accept(wParam, NULL, NULL);
 				// Prepare accepted socket for read, write, and close notification
 				WSAAsyncSelect(newSocket, hwnd, WM_USER + 1, FD_READ | FD_CLOSE);
-				send(newSocket, "Connect to server", (int)strlen("Connect to server"), 0);
+				send(newSocket, "Connected to server", (int)strlen("Connected to server"), 0);
 				cout << "client connected\n";
 				break;
 
@@ -158,8 +158,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 				}
 				else {
 					system("pause");
-					wstring message(recvBuffer, recvBuffer + RecvBytes);
-					MessageBox(hwnd, message.c_str(), L"Notification", MB_OK | MB_ICONINFORMATION);
+					string message(recvBuffer, recvBuffer + RecvBytes);
+					MessageBoxA(hwnd, message.c_str(), "Notification", MB_OK | MB_ICONINFORMATION);
 					send(SocketInfo, "Connect to server 3", (int)strlen("Connect to server 3"), 0);
 				}
 				break;
