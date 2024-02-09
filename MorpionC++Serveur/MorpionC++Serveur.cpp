@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <iostream>
 
+#include "ServerData.h"
+
 #define PORT 6969
 //#define WM_SOCKET WM_USER + 1
 
@@ -118,6 +120,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 	char recvBuffer[512];
 	dataBuf.buf = recvBuffer;
 	dataBuf.len = 512;
+	ServerData serveData = ServerData();
 
 	switch (uMsg)
 	{
@@ -157,8 +160,13 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 					}
 				}
 				else {
-					system("pause");
 					string message(recvBuffer, recvBuffer + RecvBytes);
+					if (serveData.CheckIfPlayer(message) == false) {
+						serveData.NewPlayer(message);
+					}
+					else {
+						// le serv associe les anciennes données du user au prochain coup
+					}
 					MessageBoxA(hwnd, message.c_str(), "Notification", MB_OK | MB_ICONINFORMATION);
 					send(SocketInfo, "Connect to server 3", (int)strlen("Connect to server 3"), 0);
 				}

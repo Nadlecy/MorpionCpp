@@ -95,17 +95,10 @@ int main()
 		return -1;
 	}
 
-	if (hwnd == NULL) {
-		MessageBox(NULL, L"Window creation failed", L"Error", MB_OK | MB_ICONERROR);
-		return 1;
-	}
-
-	//Show the Window
-	//ShowWindow(hwnd, nCmdShow);
-
+	//First connection
 	// assigning value to string s
 	string s;
-	cout << "message here: " << endl;
+	cout << "Name : " << endl;
 	getline(cin, s);
 	cout << endl;
 
@@ -114,6 +107,16 @@ int main()
 	printf("Hello message sentC\n");
 	printf("%s\n", buffer);
 
+
+	if (hwnd == NULL) {
+		MessageBox(NULL, L"Window creation failed", L"Error", MB_OK | MB_ICONERROR);
+		return 1;
+	}
+
+	//Show the Window
+	//ShowWindow(hwnd, nCmdShow);
+
+	
 	// Message loop
 	MSG msg;
 

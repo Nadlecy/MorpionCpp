@@ -7,11 +7,13 @@ using namespace std;
 
 class ServerData
 {
-	Json::Value playerList;
+public:
+	Json::Value playerList ;
 	Json::Value actionList;
+	Json::Value scoreList;
 	
 	ServerData();
 
 	bool CheckIfPlayer(string playerName);
-	void NewPlayer(Json::Value* newPlayerData);
+	void NewPlayer(string playerName);
 };
