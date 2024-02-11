@@ -2,6 +2,7 @@
 #include <windows.h>
 #include <stdio.h>
 #include <iostream>
+#include <json/json.h>
 
 #include "ServerData.h"
 
@@ -120,61 +121,82 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 	char recvBuffer[512];
 	dataBuf.buf = recvBuffer;
 	dataBuf.len = 512;
-	ServerData serveData = ServerData();
+	ServerData serverData = ServerData();
 
 	switch (uMsg)
 	{
-		case WM_USER + 1:
+	case WM_USER + 1:
+	{
+		// Determine what event occurred on the socket
+		switch (WSAGETSELECTEVENT(lParam))
 		{
-			// Determine what event occurred on the socket
-			switch (WSAGETSELECTEVENT(lParam))
+			//When a new connection is detected
+		case FD_ACCEPT:
+			// Accept an incoming connection
+			newSocket = accept(wParam, NULL, NULL);
+			// Prepare accepted socket for read, write, and close notification
+			WSAAsyncSelect(newSocket, hwnd, WM_USER + 1, FD_READ | FD_CLOSE);
+			send(newSocket, "Connected to server", (int)strlen("Connected to server"), 0);
+			cout << "client connected\n";
+			break;
+
+			//when a CONNECTED SOCKET is closed, not the server
+		case FD_CLOSE:
+			cout << "client connection end\n";
+			closesocket((SOCKET)wParam);
+			break;
+
+			//when a connected socket sends a message
+		case FD_READ:
+
+			SocketInfo = wParam;
+
+			if (WSARecv(SocketInfo, &dataBuf, 1, &RecvBytes, &Flags, NULL, NULL) == SOCKET_ERROR)
 			{
-				//When a new connection is detected
-			case FD_ACCEPT:
-				// Accept an incoming connection
-				newSocket = accept(wParam, NULL, NULL);
-				// Prepare accepted socket for read, write, and close notification
-				WSAAsyncSelect(newSocket, hwnd, WM_USER + 1, FD_READ | FD_CLOSE);
-				send(newSocket, "Connected to server", (int)strlen("Connected to server"), 0);
-				cout << "client connected\n";
-				break;
-
-				//when a CONNECTED SOCKET is closed, not the server.
-			case FD_CLOSE:
-				cout << "client connection end\n";
-				closesocket((SOCKET)wParam);
-				break;
-
-				//when a connected socket sends a message
-			case FD_READ:
-
-				SocketInfo = wParam;
-
-				if (WSARecv(SocketInfo, &dataBuf, 1, &RecvBytes, &Flags, NULL, NULL) == SOCKET_ERROR)
+				if (WSAGetLastError() != WSAEWOULDBLOCK)
 				{
-					if (WSAGetLastError() != WSAEWOULDBLOCK)
-					{
-						printf("WSARecv() failed with error %d\n", WSAGetLastError());
-						closesocket(SocketInfo);
-						return 0;
-					}
+					printf("WSARecv() failed with error %d\n", WSAGetLastError());
+					closesocket(SocketInfo);
+					return 0;
+				}
+			}
+			else {
+
+				//turn string into Json
+				string message(recvBuffer, recvBuffer + RecvBytes);
+
+				Json::Value board;
+				Json::Reader reader;
+				Json::FastWriter fastWriter;
+
+				bool parsingSuccessful = reader.parse(message, board);
+				if (!parsingSuccessful)
+				{
+					cout << "Error parsing the string" << endl;
 				}
 				else {
-					string message(recvBuffer, recvBuffer + RecvBytes);
-					if (serveData.CheckIfPlayer(message) == false) {
-						serveData.NewPlayer(message);
+
+					if (board["requestType"] == "Login") {
+
+						std::string playerName = fastWriter.write(board["playerName"]);
+
+						if (!serverData.CheckIfPlayer(playerName)) {
+							serverData.NewPlayer(playerName);
+
+						}
+						else {
+						}
 					}
-					else {
-						// le serv associe les anciennes données du user au prochain coup
-					}
+
 					MessageBoxA(hwnd, message.c_str(), "Notification", MB_OK | MB_ICONINFORMATION);
-					send(SocketInfo, "Connect to server 3", (int)strlen("Connect to server 3"), 0);
+					send(SocketInfo, "Actions done", (int)strlen("Actions done"), 0);
 				}
-				break;
 			}
-			return 0;
 			break;
 		}
+		return 0;
+		break;
+	}
 	}
 	return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }

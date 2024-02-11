@@ -10,7 +10,6 @@ class ServerData
 public:
 	Json::Value playerList ;
 	Json::Value actionList;
-	Json::Value scoreList;
 	
 	ServerData();
 

@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include <iostream>
 #include <string>
+#include <json/json.h>
+#include <json/writer.h>
 
 #define PORT 6969
 #define DATA_BUFSIZE 8192
@@ -90,19 +92,31 @@ int main()
 
 	SOCKET clientSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	WSAAsyncSelect(clientSocket, hwnd, WM_SOCKET, FD_READ | FD_WRITE | FD_CLOSE);
+	//First connection
 	if ((status = connect(client_fd, (struct sockaddr*)&serv_addr, sizeof(serv_addr))) < 0) {
 		MessageBox(NULL, L"Connection Failed", L"Error", MB_OK | MB_ICONERROR);
 		return -1;
 	}
 
-	//First connection
-	// assigning value to string s
+	////////////////////////////////////////// LOGGING IN //////////////////////////////////////
+	// 
+	// entering username.
 	string s;
-	cout << "Name : " << endl;
+	cout << "Enter your Username : " << endl;
 	getline(cin, s);
 	cout << endl;
 
-	const char* tmp = s.c_str();
+	// creating the request line for assigning the player's role in the game.
+	Json::Value firstReq;
+	firstReq["requestType"] = "Login";
+	firstReq["playerName"] = s; 
+
+	//making the Json into a string.
+	Json::FastWriter fastWriter;
+	std::string output = fastWriter.write(firstReq);
+	const char* tmp = output.c_str();
+
+	//sending the message to the server.
 	send(client_fd, tmp, strlen(tmp), 0);
 	printf("Hello message sentC\n");
 	printf("%s\n", buffer);
@@ -113,10 +127,9 @@ int main()
 		return 1;
 	}
 
-	//Show the Window
-	//ShowWindow(hwnd, nCmdShow);
-
 	
+
+
 	// Message loop
 	MSG msg;
 
@@ -241,8 +254,9 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					}
 				}
 				break;
+
 			case FD_CLOSE:
-				printf("Closing socket %d\n", wParam);
+				printf("Closing socket %d\n", (int)wParam);
 				FreeSocketInformation(wParam);
 				break;
 			}
