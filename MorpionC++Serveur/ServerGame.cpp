@@ -144,17 +144,23 @@ Json::Value ServerGame::End(char Winner) {
 	gameResult["requestType"] = "end";
 
 	if (Winner == ' ') {
+		//return "draw", this will simply just end the game without changing any scores
 		cout << "It's a draw!" << endl;
 		gameResult["winner"] = "draw";
 	}
 	else {
+		//return the data of the winning player
 		cout << Winner << " wins !" << endl;
-		gameResult["winner"] = Winner;
+
+		//get the winner's data
+		winnerData = GetPlayerDataFromSymbol(Winner);
+		//return the winner's username
+		gameResult["winner"] = winnerData["username"].asString();
 
 		//change the winner's score
-		winnerData = GetPlayerDataFromSymbol(Winner);
+		//retrieve the current one
 		winnerData["score"] = winnerData["score"].asInt() + 1;
-
+		//add 1
 		playerList[winnerData["playerSessionID"].asInt()] = winnerData;
 	}
 	return gameResult;
@@ -163,47 +169,4 @@ Json::Value ServerGame::End(char Winner) {
 void ServerGame::Reset() {
 	delete currentGrid;
 	currentGrid = new ServerGrid();
-}
-
-void ServerGame::Play() {
-/*	
-	while (true) {
-
-		//await player input via requests (change the "EventCheck()" line below)
-		//inputs->EventCheck();
-
-		//Showing the grid via request to players
-		//window->Display(currentGrid);
-		
-		
-		currentGrid->Display();
-
-		//Checking if there is still room to play.
-		if (currentGrid->IsFull()) {
-			End(' ');
-			break;
-		}
-
-		//A victory check happens at the end of every turn, so the moment the WinCheck succeeds, the current player is logically the winner.
-		if (currentGrid->WinCheck() != ' ') {
-			cout << currentGrid->WinCheck();
-			End(currentTurnSymbol);
-			break;
-		}
-
-		if (inputs->EventCheck()) {
-
-			//Asking where the current player wants to play.
-			Place();
-
-			//Switching turns.
-			ChangeTurn();
-
-			inputs->mouseX = NULL;
-			inputs->mouseX = NULL;
-
-		}
-	}
-	playing = AskReplay();
-	*/
 }

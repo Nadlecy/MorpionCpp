@@ -215,6 +215,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 							}
 						}
 					}
+
 					MessageBoxA(hwnd, message.c_str(), "Notification", MB_OK | MB_ICONINFORMATION);
 					send(SocketInfo, "Actions done", (int)strlen("Actions done"), 0);
 				}

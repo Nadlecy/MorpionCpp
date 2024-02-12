@@ -33,6 +33,5 @@ public:
 	bool Place(int boxIndex);
 	Json::Value End(char Winner);
 	void Reset();
-	void Play();
 };
 
