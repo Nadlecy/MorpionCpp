@@ -105,7 +105,7 @@ int main()
 	}
 
 	////////////////////////////////////////// LOGGING IN //////////////////////////////////////
-	// 
+
 	// entering username.
 	string s;
 	cout << "Enter your Username : " << endl;
@@ -127,6 +127,7 @@ int main()
 	printf("Hello message sentC\n");
 	printf("%s\n", buffer);
 
+	//////////////////////////////////////////////////////////////////////////////////////////////
 
 	if (hwnd == NULL) {
 		MessageBox(NULL, L"Window creation failed", L"Error", MB_OK | MB_ICONERROR);
@@ -134,8 +135,6 @@ int main()
 	}
 
 	
-
-
 	// Message loop
 	MSG msg;
 

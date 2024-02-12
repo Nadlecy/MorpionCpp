@@ -1,5 +1,4 @@
 #include "ServerGrid.h"
-#include "ServerGridBox.h"
 
 //creates a new grid composed of 9 empty boxes
 ServerGrid::ServerGrid() {

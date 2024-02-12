@@ -3,9 +3,9 @@
 #include <vector>
 #include <iostream>
 
-using namespace std;
+#include "ServerGridBox.h"
 
-class ServerGridBox;
+using namespace std;
 
 class ServerGrid
 {

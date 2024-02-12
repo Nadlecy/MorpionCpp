@@ -4,7 +4,8 @@
 #include <iostream>
 #include <json/json.h>
 
-#include "ServerData.h"
+#include "ServerGame.h"
+
 
 #define PORT 6969
 //#define WM_SOCKET WM_USER + 1
@@ -13,7 +14,8 @@
 
 using namespace std;
 
-ServerData serverData = ServerData();
+ServerGame serverGame = ServerGame();
+
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -182,32 +184,37 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 
 						std::string playerName = fastWriter.write(board["playerName"]);
 
-						if (!serverData.CheckIfPlayer(playerName)) {
-							serverData.NewPlayer(playerName);
+						if (!serverGame.CheckIfPlayer(playerName)) {
+							serverGame.NewPlayer(playerName);
 
 						}
 						else {
 						}
-						break;
 					} 
 
 					//if player is trying to place their symbol on the grid
 					else if (board["requestType"] == "Place") {
 
 						std::string playerName = fastWriter.write(board["playerName"]);
-						int index = board["placeIndex"].asInt();
+						int placeIndex = board["placeIndex"].asInt();
 
 						//check if it's their turn
+						if (serverGame.currentTurnSymbol == serverGame.GetPlayerData(playerName)["turnSymbol"].toStyledString().at(0)) {
+							
+							//check if they can place it on the chosen space, then place it
+							if (serverGame.Place(placeIndex)) {
+								//change turn
+								serverGame.ChangeTurn();
 
-						//check if they can place it on the chosen space
-
-						//place it
-
-						//change turn
-
-						break;
+								//check for a victory
+								if (serverGame.currentGrid->WinCheck()!=' ') {
+									serverGame.End(serverGame.currentGrid->WinCheck());
+								}else if (serverGame.currentGrid->IsFull()) {
+									serverGame.End(' ');
+								}
+							}
+						}
 					}
-
 					MessageBoxA(hwnd, message.c_str(), "Notification", MB_OK | MB_ICONINFORMATION);
 					send(SocketInfo, "Actions done", (int)strlen("Actions done"), 0);
 				}
