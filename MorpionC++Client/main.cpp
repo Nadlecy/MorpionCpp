@@ -1,5 +1,10 @@
 #pragma comment(lib, "ws2_32.lib")
 
+#define NOMINMAX 
+#define PORT 6969
+#define DATA_BUFSIZE 8192
+//#define IPADDRESS 10.1.144.26
+
 #include <winsock2.h>
 #include <windows.h>
 #include <ws2tcpip.h>
@@ -11,10 +16,6 @@
 #include <json/writer.h>
 
 #include "ClientGame.h"
-
-#define PORT 6969
-#define DATA_BUFSIZE 8192
-//#define IPADDRESS 10.1.144.26
 
 using namespace std;
 
