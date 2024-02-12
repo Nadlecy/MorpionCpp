@@ -10,6 +10,8 @@
 #include <json/json.h>
 #include <json/writer.h>
 
+#include "ClientGame.h"
+
 #define PORT 6969
 #define DATA_BUFSIZE 8192
 //#define IPADDRESS 10.1.144.26
@@ -31,6 +33,9 @@ typedef struct _SOCKET_INFORMATION {
 LPSOCKET_INFORMATION SocketInfoList;
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+
+ClientGame thisGame;
 
 //int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
 int main()

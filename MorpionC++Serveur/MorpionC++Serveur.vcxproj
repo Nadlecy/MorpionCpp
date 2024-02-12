@@ -133,12 +133,18 @@
     <ClCompile Include="..\jsoncpp-1.9.5\src\lib_json\json_writer.cpp" />
     <ClCompile Include="MorpionC++Serveur.cpp" />
     <ClCompile Include="ServerData.cpp" />
+    <ClCompile Include="ServerGame.cpp" />
+    <ClCompile Include="ServerGrid.cpp" />
+    <ClCompile Include="ServerGridBox.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
     <ClInclude Include="MorpionC++Serveur.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="ServerData.h" />
+    <ClInclude Include="ServerGame.h" />
+    <ClInclude Include="ServerGrid.h" />
+    <ClInclude Include="ServerGridBox.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
