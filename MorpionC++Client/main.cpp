@@ -145,6 +145,8 @@ int main()
 		//Ajouter fonction de jeu (et le send)
 	}
 
+	//FIND A WAY TO MAKE THE GAME LOOP
+
 	// Cleanup
 	closesocket(clientSocket);
 	WSACleanup();
@@ -218,6 +220,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	DWORD RecvBytes;
 	DWORD SendBytes;
 	DWORD Flags;
+	Json::Reader reader;
+	Json::FastWriter fastWriter;
 
 	if (uMsg == WM_SOCKET)
 	{
@@ -229,6 +233,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		else
 		{
 			printf("Socket looks fine!\n");
+
+			// Determine what event occurred on the socket
 			switch (WSAGETSELECTEVENT(lParam)) {
 			case FD_READ:
 				SocketInfo = GetSocketInformation(wParam);
@@ -240,6 +246,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				}
 				else
 				{
+
+					//WHY IS IT HANDLED DIFFERENTLY HERE ?? I DONT GET IT ???
 					SocketInfo->DataBuf.buf = SocketInfo->Buffer;
 					SocketInfo->DataBuf.len = DATA_BUFSIZE;
 					Flags = 0;

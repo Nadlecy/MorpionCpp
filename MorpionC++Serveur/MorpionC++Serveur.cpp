@@ -123,6 +123,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 	char recvBuffer[512];
 	dataBuf.buf = recvBuffer;
 	dataBuf.len = 512;
+	Json::Reader reader;
+	Json::FastWriter fastWriter;
 
 	switch (uMsg)
 	{
@@ -167,8 +169,6 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 				string message(recvBuffer, recvBuffer + RecvBytes);
 
 				Json::Value board;
-				Json::Reader reader;
-				Json::FastWriter fastWriter;
 
 				bool parsingSuccessful = reader.parse(message, board);
 				if (!parsingSuccessful)
@@ -187,6 +187,10 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 						}
 						else {
 						}
+						break;
+					} 
+					else if (board["requestType"] == "") {
+						break;
 					}
 
 					MessageBoxA(hwnd, message.c_str(), "Notification", MB_OK | MB_ICONINFORMATION);
