@@ -13,6 +13,8 @@
 
 using namespace std;
 
+ServerData serverData = ServerData();
+
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 
@@ -98,7 +100,7 @@ int main()
 
 	// Message loop
 	MSG msg;
-
+	
 	while (GetMessage(&msg, NULL, 0, 0)) {
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
@@ -121,7 +123,6 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 	char recvBuffer[512];
 	dataBuf.buf = recvBuffer;
 	dataBuf.len = 512;
-	ServerData serverData = ServerData();
 
 	switch (uMsg)
 	{

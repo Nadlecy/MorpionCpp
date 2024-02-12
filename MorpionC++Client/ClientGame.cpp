@@ -8,15 +8,6 @@ ClientGame::ClientGame() {
 
 }
 
-void ClientGame::ChangeTurn() {
-	if (currentPlayerTurn == 'O') {
-		currentPlayerTurn = 'X';
-	}
-	else if (currentPlayerTurn == 'X') {
-		currentPlayerTurn = 'O';
-	}
-}
-
 void ClientGame::Place() {
 	bool hasPlaced = false;
 	int boxIndex;
@@ -83,11 +74,8 @@ void ClientGame::Play() {
 			//Asking where the current player wants to play.
 			Place();
 
-			//Switching turns.
-			ChangeTurn();
-
 			inputs->mouseX = NULL;
-			inputs->mouseX = NULL;
+			inputs->mouseY = NULL;
 
 		}
 	}

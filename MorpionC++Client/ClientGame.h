@@ -17,10 +17,8 @@ public:
 
 	ClientGame();
 
-	void ChangeTurn();
 	void Place();
 	void End(char Winner);
 	bool AskReplay();
-	void Reset();
 	void Play();
 };
