@@ -177,6 +177,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 				}
 				else {
 
+					//if player is logging in
 					if (board["requestType"] == "Login") {
 
 						std::string playerName = fastWriter.write(board["playerName"]);
@@ -189,7 +190,21 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 						}
 						break;
 					} 
-					else if (board["requestType"] == "") {
+
+					//if player is trying to place their symbol on the grid
+					else if (board["requestType"] == "Place") {
+
+						std::string playerName = fastWriter.write(board["playerName"]);
+						int index = board["placeIndex"].asInt();
+
+						//check if it's their turn
+
+						//check if they can place it on the chosen space
+
+						//place it
+
+						//change turn
+
 						break;
 					}
 
