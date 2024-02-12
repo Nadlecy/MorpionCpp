@@ -35,7 +35,6 @@ LPSOCKET_INFORMATION SocketInfoList;
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-
 ClientGame thisGame;
 
 //int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
@@ -99,6 +98,9 @@ int main()
 	SOCKET clientSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	WSAAsyncSelect(clientSocket, hwnd, WM_SOCKET, FD_READ | FD_WRITE | FD_CLOSE);
 	//First connection
+
+	// MAKE SURE THIS IS ACTUALLY CONNECTING TO THE SERVER !! 
+	// IT MIGHT JUST BE CONNECTING THE CLIENT TO ITSELF !!! :(
 	if ((status = connect(client_fd, (struct sockaddr*)&serv_addr, sizeof(serv_addr))) < 0) {
 		MessageBox(NULL, L"Connection Failed", L"Error", MB_OK | MB_ICONERROR);
 		return -1;
@@ -116,6 +118,7 @@ int main()
 	Json::Value firstReq;
 	firstReq["requestType"] = "Login";
 	firstReq["playerName"] = s; 
+	firstReq["clientSocket"] = clientSocket;
 
 	//making the Json into a string.
 	Json::FastWriter fastWriter;
@@ -198,8 +201,6 @@ void CreateSocketInformation(SOCKET s)
 	SocketInfoList = SI;
 }
 
-
-
 LPSOCKET_INFORMATION GetSocketInformation(SOCKET s)
 {
 	SOCKET_INFORMATION* SI = SocketInfoList;
@@ -211,6 +212,8 @@ LPSOCKET_INFORMATION GetSocketInformation(SOCKET s)
 	}
 	return NULL;
 }
+
+
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 

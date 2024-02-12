@@ -1,5 +1,6 @@
 #include "ServerGrid.h"
 
+
 //creates a new grid composed of 9 empty boxes
 ServerGrid::ServerGrid() {
 	for (int i = 0; i < 9; i++)
@@ -15,6 +16,30 @@ void ServerGrid::Display() {
 			//cout << boxList[line * 3 + column]->GetValue();
 		}
 		//cout << endl;
+	}
+}
+
+void ServerGrid::SendGrid(vector<SOCKET*> client_fd){
+	Json::Value grid;
+	string socketString;
+	for (int line = 0; line < 3; line++) {
+		for (int column = 0; column < 3; column++) {
+			socketString.push_back(boxList[line * 3 + column]->GetValue());
+		}
+	}
+	
+	//preparing the json for departure
+	grid["requestType"] = "sendGrid";
+	grid["grid"] = socketString;
+
+	//making the Json into a string.
+	Json::FastWriter fastWriter;
+	std::string output = fastWriter.write(grid);
+	const char* tmp = output.c_str();
+
+	//sending the message to the client.
+	for (int i = 0; i < client_fd.size(); i++) {
+		send(*client_fd[i], tmp, strlen(tmp), 0);
 	}
 }
 

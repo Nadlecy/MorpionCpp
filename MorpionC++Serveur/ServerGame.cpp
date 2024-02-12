@@ -3,6 +3,7 @@
 ServerGame::ServerGame() {
 	//server data
 	playerList;
+	socketList;
 	actionList;
 
 	//game data
@@ -21,7 +22,7 @@ ServerGame::ServerGame() {
 bool ServerGame::CheckIfPlayer(string playerName) {
 	/*Checks if there is any player with this name in playerList*/
 
-	for (int i = 0; i < playerList.size(); i++)
+	for (int i = 0; i < (int)playerList.size(); i++)
 	{
 		if (playerList[i]["username"].toStyledString() == playerName) {
 			return true;
@@ -69,7 +70,8 @@ void ServerGame::NewPlayer(string playerName) {
 	playerList[newPlrID]["username"] = playerName;
 	//initializing the score
 	playerList[newPlrID]["score"] = 0;
-
+	//the login is done instantly after the accept, so we can afford to pull directly the last piece of data in the socketList
+	playerList[newPlrID]["clientSocket"] = socketList[socketList.size() - 1];
 	//determining the player's symbol from their ID for the session. First two players to join get to play.
 	switch (newPlrID){
 	case 0:
@@ -88,6 +90,7 @@ void ServerGame::NewPlayer(string playerName) {
 		"username" : playerName (string)
 		"score" : 0 (int)
 		"turnSymbol" : (char)
+		"clientSocket" : (SOCKET*)
 	}
 	*/
 }
@@ -131,10 +134,12 @@ bool ServerGame::Place(int boxIndex) {
 
 }
 
-Json::Value ServerGame::End(char Winner) {
-	/*this function should return an adequate json, telling the players how the game ended, ie :
+void ServerGame::End(char Winner, vector<SOCKET*> client_fd) {
+	/*this function should send a json, telling the players how the game ended, ie :
 	{
-		gameWinner: "draw/playername1/playername2"
+		requestType: "end" (string)
+		gameWinner: "draw/playername1/playername2" (string)
+		score: (int)
 	}
 	the clientside will figure out how to display adequate text on its own
 	*/
@@ -163,7 +168,19 @@ Json::Value ServerGame::End(char Winner) {
 		//add 1
 		playerList[winnerData["playerSessionID"].asInt()] = winnerData;
 	}
-	return gameResult;
+
+	//sending the message to the client.
+	for (int i = 0; i < client_fd.size(); i++) {
+		//retrieve player's score and put it in the Json
+		gameResult["score"] = playerList[i]["score"];
+
+		//making the Json into a string.
+		Json::FastWriter fastWriter;
+		std::string output = fastWriter.write(gameResult);
+		const char* tmp = output.c_str();
+
+		send(playerList[i]["socket"].asInt(), tmp, strlen(tmp), 0);
+	}
 }
 
 void ServerGame::Reset() {

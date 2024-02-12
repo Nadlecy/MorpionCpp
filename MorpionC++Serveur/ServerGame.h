@@ -2,7 +2,8 @@
 
 #include <iostream>
 #include <json/json.h>
-
+#include <winsock2.h>
+#include <ws2tcpip.h>
 #include "ServerGrid.h"
 
 using namespace std;
@@ -12,6 +13,7 @@ class ServerGame
 public:
 	//server values
 	Json::Value playerList;
+	vector<SOCKET*> socketList;
 	Json::Value actionList;
 
 	//game values
@@ -31,7 +33,7 @@ public:
 	//game functions
 	void ChangeTurn();
 	bool Place(int boxIndex);
-	Json::Value End(char Winner);
+	void End(char Winner, vector<SOCKET*> client_fd);
 	void Reset();
 };
 

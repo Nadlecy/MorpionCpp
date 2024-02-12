@@ -139,6 +139,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 		case FD_ACCEPT:
 			// Accept an incoming connection
 			newSocket = accept(wParam, NULL, NULL);
+			serverGame.socketList.push_back(&newSocket);
 			// Prepare accepted socket for read, write, and close notification
 			WSAAsyncSelect(newSocket, hwnd, WM_USER + 1, FD_READ | FD_CLOSE);
 			send(newSocket, "Connected to server", (int)strlen("Connected to server"), 0);
@@ -208,14 +209,14 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 
 								//check for a victory
 								if (serverGame.currentGrid->WinCheck()!=' ') {
-									serverGame.End(serverGame.currentGrid->WinCheck());
+									serverGame.End(serverGame.currentGrid->WinCheck(),serverGame.socketList);
 								}else if (serverGame.currentGrid->IsFull()) {
-									serverGame.End(' ');
+									serverGame.End(' ',serverGame.socketList);
 								}
 							}
 						}
 					}
-
+					serverGame.currentGrid->SendGrid(serverGame.socketList);
 					MessageBoxA(hwnd, message.c_str(), "Notification", MB_OK | MB_ICONINFORMATION);
 					send(SocketInfo, "Actions done", (int)strlen("Actions done"), 0);
 				}

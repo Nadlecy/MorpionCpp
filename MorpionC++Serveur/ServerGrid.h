@@ -2,6 +2,9 @@
 
 #include <vector>
 #include <iostream>
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#include <json/json.h>
 
 #include "ServerGridBox.h"
 
@@ -17,5 +20,6 @@ public:
 	void Display();
 	bool IsFull();
 	char WinCheck();
+	void SendGrid(vector<SOCKET*> client_fd);
 };
 
