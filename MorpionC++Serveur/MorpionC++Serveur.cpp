@@ -145,7 +145,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 
 			//when a CONNECTED SOCKET is closed, not the server
 		case FD_CLOSE:
-			cout << "client connection end\n";
+			cout << "client disconnected\n";
 			closesocket((SOCKET)wParam);
 			break;
 
