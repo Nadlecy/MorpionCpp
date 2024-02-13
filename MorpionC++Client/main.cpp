@@ -76,13 +76,9 @@ int main()
 		return 1;
 	}
 
-	int status, valread, client_fd;
+	int status, valread;
 	struct sockaddr_in serv_addr;
 	char buffer[1024] = { 0 };
-	if ((client_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-		MessageBox(NULL, L"Socket creation error", L"Error", MB_OK | MB_ICONERROR);
-		return -1;
-	}
 
 	serv_addr.sin_family = AF_INET;
 	serv_addr.sin_port = htons(PORT);
@@ -96,42 +92,16 @@ int main()
 	}
 
 	SOCKET clientSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-	WSAAsyncSelect(clientSocket, hwnd, WM_SOCKET, FD_READ | FD_WRITE | FD_CLOSE);
+
 	//First connection
 
 	// MAKE SURE THIS IS ACTUALLY CONNECTING TO THE SERVER !! 
 	// IT MIGHT JUST BE CONNECTING THE CLIENT TO ITSELF !!! :(
-	if ((status = connect(client_fd, (struct sockaddr*)&serv_addr, sizeof(serv_addr))) < 0) {
+	if ((status = connect(clientSocket, (struct sockaddr*)&serv_addr, sizeof(serv_addr))) < 0) {
 		MessageBox(NULL, L"Connection Failed", L"Error", MB_OK | MB_ICONERROR);
 		return -1;
 	}
-
-	////////////////////////////////////////// LOGGING IN //////////////////////////////////////
-
-	// entering username.
-	string s;
-	cout << "Enter your Username : " << endl;
-	getline(cin, s);
-	cout << endl;
-
-	// creating the request line for assigning the player's role in the game.
-	Json::Value firstReq;
-	firstReq["requestType"] = "Login";
-	firstReq["playerName"] = s; 
-	firstReq["clientSocket"] = clientSocket;
-
-	//making the Json into a string.
-	Json::FastWriter fastWriter;
-	std::string output = fastWriter.write(firstReq);
-	const char* tmp = output.c_str();
-
-	//sending the message to the server.
-	send(client_fd, tmp, strlen(tmp), 0);
-	printf("User Data sent\n");
-	printf("%s\n", buffer);
-
-	thisGame.window->LoadingDisplay();
-
+	WSAAsyncSelect(clientSocket, hwnd, WM_SOCKET, FD_READ | FD_CLOSE);
 	//////////////////////////////////////////////////////////////////////////////////////////////
 
 	if (hwnd == NULL) {
@@ -139,13 +109,45 @@ int main()
 		return 1;
 	}
 
-	
+	thisGame.window->LoadingDisplay();
+
+	bool loggedIn = false;
+
 	// Message loop
 	MSG msg;
-
-	while (GetMessage(&msg, NULL, 0, 0)) {
+	
+	//GETS HERE TOO LATE, SERVER ALREADY SENT DATA BEFORE
+	//while we're ready to receive messages from the server, and we're still playing.
+	while (GetMessage(&msg, NULL, 0, 0) && thisGame.playing) {
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
+
+		if (!loggedIn) {
+			////////////////////////////////////////// LOGGING IN //////////////////////////////////////
+			// entering username.
+			string s;
+			cout << "Enter your Username : " << endl;
+			getline(cin, s);
+			cout << endl;
+
+			// creating the request line for assigning the player's role in the game.
+			Json::Value firstReq;
+			firstReq["requestType"] = "Login";
+			firstReq["playerName"] = s;
+			firstReq["clientSocket"] = clientSocket;
+
+			//making the Json into a string.
+			Json::FastWriter fastWriter;
+			std::string output = fastWriter.write(firstReq);
+			const char* tmp = output.c_str();
+
+			//sending the message to the server.
+			send(clientSocket, tmp, strlen(tmp), 0);
+			printf("User Data sent\n");
+			printf("%s\n", buffer);
+
+			loggedIn = true;
+		}
 	}
 
 	// Cleanup
@@ -282,6 +284,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 							}
 
 							thisGame.window->Display(thisGame.currentGrid);
+							
 
 						//when the server says the game is over
 						}else if (board["requestType"] == "end") {
@@ -304,6 +307,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			case FD_CLOSE:
 				printf("Closing socket %d\n", (int)wParam);
 				FreeSocketInformation(wParam);
+				thisGame.playing = false;
 				break;
 			}
 		}

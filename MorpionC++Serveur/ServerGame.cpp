@@ -144,7 +144,7 @@ bool ServerGame::Place(int boxIndex) {
 
 }
 
-void ServerGame::End(char Winner, vector<SOCKET*> client_fd) {
+void ServerGame::End(char Winner, vector<SOCKET> client_fd) {
 	/*this function should send a json, telling the players how the game ended, ie :
 	{
 		requestType: "end" (string)

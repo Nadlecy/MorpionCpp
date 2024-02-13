@@ -13,7 +13,7 @@ class ServerGame
 public:
 	//server values
 	Json::Value playerList;
-	vector<SOCKET*> socketList;
+	vector<SOCKET> socketList;
 	Json::Value actionList;
 
 	//game values
@@ -34,7 +34,7 @@ public:
 	//game functions
 	void ChangeTurn();
 	bool Place(int boxIndex);
-	void End(char Winner, vector<SOCKET*> client_fd);
+	void End(char Winner, vector<SOCKET> client_fd);
 	void Reset();
 };
 

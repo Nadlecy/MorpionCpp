@@ -84,7 +84,7 @@ void ClientWindow::Display(vector<char> currentGrid) {
 void ClientWindow::LoadingDisplay() {
 	oWindow->clear();
 
-
+	//temporarily changing the lines' color
 	for (int i = 0; i < 4; i++) {
 		gridLines[i]->setFillColor(sf::Color(153, 0, 153));
 
@@ -94,6 +94,10 @@ void ClientWindow::LoadingDisplay() {
 		oWindow->draw(*gridLines[i]);
 	}
 
+	for (int i = 0; i < 4; i++) {
+		gridLines[i]->setFillColor(sf::Color(0, 153, 0));
+
+	}
 
 	//Updates the window.
 	oWindow->display();

@@ -20,6 +20,6 @@ public:
 	void Display();
 	bool IsFull();
 	char WinCheck();
-	void SendGrid(vector<SOCKET*> client_fd);
+	void SendGrid(vector<SOCKET> client_fd);
 };
 

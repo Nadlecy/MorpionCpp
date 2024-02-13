@@ -139,8 +139,9 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 		case FD_ACCEPT:
 			// Accept an incoming connection
 			newSocket = accept(wParam, NULL, NULL);
-			serverGame.socketList.push_back(&newSocket);
+			serverGame.socketList.push_back(newSocket);
 			// Prepare accepted socket for read, write, and close notification
+			cout << "Client Socket:" <<newSocket<<endl;
 			WSAAsyncSelect(newSocket, hwnd, WM_USER + 1, FD_READ | FD_CLOSE);
 			cout << "client connected\n";
 			break;
