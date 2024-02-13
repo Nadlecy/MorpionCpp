@@ -80,3 +80,21 @@ void ClientWindow::Display(vector<char> currentGrid) {
 	//Updates the window.
 	oWindow->display();
 }
+
+void ClientWindow::LoadingDisplay() {
+	oWindow->clear();
+
+
+	for (int i = 0; i < 4; i++) {
+		gridLines[i]->setFillColor(sf::Color(153, 0, 153));
+
+	}
+
+	for (int i = 0; i < 4; i++) {
+		oWindow->draw(*gridLines[i]);
+	}
+
+
+	//Updates the window.
+	oWindow->display();
+}

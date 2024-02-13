@@ -142,7 +142,6 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 			serverGame.socketList.push_back(&newSocket);
 			// Prepare accepted socket for read, write, and close notification
 			WSAAsyncSelect(newSocket, hwnd, WM_USER + 1, FD_READ | FD_CLOSE);
-			send(newSocket, "Connected to server", (int)strlen("Connected to server"), 0);
 			cout << "client connected\n";
 			break;
 
@@ -190,6 +189,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 
 						}
 						else {
+							serverGame.PlayerSocketUpdate(playerName);
 						}
 					} 
 
@@ -215,10 +215,11 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 								}
 							}
 						}
+					}else if(board["requestType"]=="Reset"){
+
 					}
 					serverGame.currentGrid->SendGrid(serverGame.socketList);
 					MessageBoxA(hwnd, message.c_str(), "Notification", MB_OK | MB_ICONINFORMATION);
-					send(SocketInfo, "Actions done", (int)strlen("Actions done"), 0);
 				}
 			}
 			break;

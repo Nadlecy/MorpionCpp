@@ -75,13 +75,13 @@ void ServerGame::NewPlayer(string playerName) {
 	//determining the player's symbol from their ID for the session. First two players to join get to play.
 	switch (newPlrID){
 	case 0:
-		playerList["turnSymbol"] = 'O';
+		playerList[newPlrID]["turnSymbol"] = 'O';
 		break;
 	case 1:
-		playerList["turnSymbol"] = 'X';
+		playerList[newPlrID]["turnSymbol"] = 'X';
 		break;
 	default:
-		playerList["turnSymbol"] = ' ';
+		playerList[newPlrID]["turnSymbol"] = ' ';
 	}
 
 	/* Player JSON template :
@@ -93,6 +93,16 @@ void ServerGame::NewPlayer(string playerName) {
 		"clientSocket" : (SOCKET*)
 	}
 	*/
+}
+
+void ServerGame::PlayerSocketUpdate(string playerName) {
+	/*Updates a returning player's socket info in the playerList json*/
+
+	//finding the data of the player who came back.
+	int newPlrID = GetPlayerData(playerName)["playerSessionID"].asInt();
+
+	//updating the socket number to match their new one
+	playerList[newPlrID]["clientSocket"] = socketList[socketList.size() - 1];
 }
 
 

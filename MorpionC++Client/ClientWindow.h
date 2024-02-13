@@ -26,4 +26,5 @@ public:
     void DrawCircle(int posX, int posY);
     void DrawCross(int posX, int posY);
     void Display(vector<char> currentGrid);
+    void LoadingDisplay();
 };

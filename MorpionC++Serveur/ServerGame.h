@@ -29,6 +29,7 @@ public:
 	Json::Value GetPlayerData(string playerName); 
 	Json::Value GetPlayerDataFromSymbol(char symbol);
 	void NewPlayer(string playerName);
+	void PlayerSocketUpdate(string playerName);
 
 	//game functions
 	void ChangeTurn();

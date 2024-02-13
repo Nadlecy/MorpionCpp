@@ -89,7 +89,7 @@ int main()
 
 	// Convert IPv4 and IPv6 addresses from text to binary
 	// form
-	if (inet_pton(AF_INET, "192.168.1.152", &serv_addr.sin_addr)
+	if (inet_pton(AF_INET, "10.1.144.26", &serv_addr.sin_addr)
 		<= 0) {
 		MessageBox(NULL, L"Invalid address / Address not supported", L"Error", MB_OK | MB_ICONERROR);
 		return -1;
@@ -127,8 +127,10 @@ int main()
 
 	//sending the message to the server.
 	send(client_fd, tmp, strlen(tmp), 0);
-	printf("Hello message sentC\n");
+	printf("User Data sent\n");
 	printf("%s\n", buffer);
+
+	thisGame.window->LoadingDisplay();
 
 	//////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -144,10 +146,7 @@ int main()
 	while (GetMessage(&msg, NULL, 0, 0)) {
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
-		//Ajouter fonction de jeu (et le send)
 	}
-
-	//FIND A WAY TO MAKE THE GAME LOOP
 
 	// Cleanup
 	closesocket(clientSocket);
@@ -218,10 +217,14 @@ LPSOCKET_INFORMATION GetSocketInformation(SOCKET s)
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 {
-	LPSOCKET_INFORMATION SocketInfo;
+	SOCKET SocketInfo;
+	WSABUF dataBuf;
 	DWORD RecvBytes;
 	DWORD SendBytes;
-	DWORD Flags;
+	DWORD Flags = 0;
+	char recvBuffer[512];
+	dataBuf.buf = recvBuffer;
+	dataBuf.len = 512;
 	Json::Reader reader;
 	Json::FastWriter fastWriter;
 
@@ -239,34 +242,61 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			// Determine what event occurred on the socket
 			switch (WSAGETSELECTEVENT(lParam)) {
 			case FD_READ:
-				SocketInfo = GetSocketInformation(wParam);
-				// Read data only if the receive buffer is empty
-				if (SocketInfo->BytesRECV != 0)
-				{
-					SocketInfo->RecvPosted = TRUE;
-					return 0;
-				}
-				else
-				{
+				
 
-					//WHY IS IT HANDLED DIFFERENTLY HERE ?? I DONT GET IT ???
-					SocketInfo->DataBuf.buf = SocketInfo->Buffer;
-					SocketInfo->DataBuf.len = DATA_BUFSIZE;
-					Flags = 0;
-					if (WSARecv(SocketInfo->Socket, &(SocketInfo->DataBuf), 1, &RecvBytes,
-						&Flags, NULL, NULL) == SOCKET_ERROR)
+
+				SocketInfo = wParam;
+
+				if (WSARecv(SocketInfo, &dataBuf, 1, &RecvBytes, &Flags, NULL, NULL) == SOCKET_ERROR)
+				{
+					if (WSAGetLastError() != WSAEWOULDBLOCK)
 					{
-						if (WSAGetLastError() != WSAEWOULDBLOCK)
-						{
-							printf("WSARecv() failed with error %d\n", WSAGetLastError());
-							FreeSocketInformation(wParam);
-							return 0;
-						}
+						printf("WSARecv() failed with error %d\n", WSAGetLastError());
+						closesocket(SocketInfo);
+						return 0;
 					}
-					else // No error so update the byte count
+				}
+				else {
+
+					//turn string into Json
+					string message(recvBuffer, recvBuffer + RecvBytes);
+
+					Json::Value board;
+
+					bool parsingSuccessful = reader.parse(message, board);
+					if (!parsingSuccessful)
 					{
-						printf("WSARecv() is OK!\n");
-						SocketInfo->BytesRECV = RecvBytes;
+						cout << "Error parsing the string" << endl;
+					}
+					else {
+
+						//when the server sends an updated grid
+						if (board["requestType"] == "sendGrid") {
+							cout << "hitting the griddy\n";
+
+							string gridString = board["grid"].asString();
+
+							for (int i = 0; i < 9; i++)
+							{
+								thisGame.currentGrid[i] = gridString.at(i);
+							}
+
+							thisGame.window->Display(thisGame.currentGrid);
+
+						//when the server says the game is over
+						}else if (board["requestType"] == "end") {
+							cout << "im gonna end it istfg\n";
+
+							if (board["winner"] == "draw") {
+								cout << "it's a draw!\n";
+							}
+							else {
+								cout << "%s wins!\n", board["winner"];
+								cout << "your score is %d.\n", board["score"];
+							}
+
+							//ask to replay or end the game
+						}
 					}
 				}
 				break;
