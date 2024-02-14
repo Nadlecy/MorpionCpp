@@ -34,7 +34,6 @@ bool ServerGame::CheckIfPlayer(string playerName) {
 Json::Value ServerGame::GetPlayerData(Json::String playerName) {
 	/*Checks if there is anGetPlayerDatay player with this name in playerList*/
 
-	cout << "GETTING : " << playerName << endl;
 	for (int i = 0; i < playerList.size(); i++)
 	{
 		cout << "GET PLAYER DATA: " << playerList[i]["username"] << endl;
