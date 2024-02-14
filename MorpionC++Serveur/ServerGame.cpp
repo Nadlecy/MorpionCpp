@@ -8,7 +8,7 @@ ServerGame::ServerGame() {
 
 	//game data
 	currentGrid = new ServerGrid();
-	currentTurnSymbol = '0';
+	currentTurnSymbol = 'O';
 	playing = true;
 
 }
@@ -31,12 +31,14 @@ bool ServerGame::CheckIfPlayer(string playerName) {
 	return false;
 }
 
-Json::Value ServerGame::GetPlayerData(string playerName) {
+Json::Value ServerGame::GetPlayerData(Json::String playerName) {
 	/*Checks if there is anGetPlayerDatay player with this name in playerList*/
 
+	cout << "GETTING : " << playerName << endl;
 	for (int i = 0; i < playerList.size(); i++)
 	{
-		if (playerList[i]["username"].toStyledString() == playerName) {
+		cout << "GET PLAYER DATA: " << playerList[i]["username"] << endl;
+		if (playerList[i]["username"] == playerName) {
 			return playerList[i];
 		}
 	}

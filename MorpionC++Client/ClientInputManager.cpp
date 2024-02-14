@@ -6,9 +6,15 @@
 
 ClientInputManager::ClientInputManager(ClientWindow* window) {
 	Window = window;
+	currentMessage = "";
 }
 
-bool ClientInputManager::EventCheck() {
+void ClientInputManager::EmptyMessage() {
+	currentMessage = "";
+}
+
+bool ClientInputManager::EventCheck(std::string username) {
+	Json::Value board;
 
 	while (Window->oWindow->pollEvent(oEvent))
 	{
@@ -20,8 +26,22 @@ bool ClientInputManager::EventCheck() {
 		else if (oEvent.type == sf::Event::MouseButtonReleased) {
 			if (oEvent.mouseButton.button == sf::Mouse::Left) {
 
-				mouseX = (oEvent.mouseButton.x - 100) / (Window->windowH / 3); // a modifier le 100 pour rendre la page responsive ( car il y a des bords a gauche et a droit qu'il ne faut pas compter)
+				mouseX = (oEvent.mouseButton.x - 100) / (Window->windowW / 3); // a modifier le 100 pour rendre la page responsive ( car il y a des bords a gauche et a droit qu'il ne faut pas compter)
 				mouseY = oEvent.mouseButton.y / (Window->windowH / 3) * 3;
+				cout << "click" << endl;
+
+				board["requestType"] = "Place";
+				board["playerName"] = username;
+				board["placeIndex"] = (mouseX + mouseY * 3);
+				cout << username << endl;
+				cout << board["playerName"]<<endl;
+
+				//making the Json into a string.
+				Json::FastWriter fastWriter;
+				std::string output = fastWriter.write(board);
+				currentMessage = output.c_str();
+
+				readyToSend = true;
 
 				return true;
 			}

@@ -5,10 +5,18 @@ ClientGame::ClientGame() {
 	inputs = new ClientInputManager(window);
 	currentPlayerTurn = 'O';
 	playing = true;
-
+	for (int i = 0; i < 9; i++) {
+		currentGrid.push_back(' ');
+	}
 }
 
 void ClientGame::Place() {
+
+	//change to send a place request
+
+
+
+	/*
 	bool hasPlaced = false;
 	int boxIndex;
 
@@ -27,7 +35,7 @@ void ClientGame::Place() {
 			currentGrid[boxIndex] = currentPlayerTurn;
 			hasPlaced = true;
 		}
-	}
+	}*/
 }
 
 void ClientGame::End(char Winner) {
@@ -59,7 +67,7 @@ bool ClientGame::AskReplay() {
 		}
 	}
 }
-
+/*
 void ClientGame::Play() {
 	while (true) {
 
@@ -80,4 +88,4 @@ void ClientGame::Play() {
 		}
 	}
 	playing = AskReplay();
-}
+}*/
