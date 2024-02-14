@@ -13,14 +13,12 @@ ServerGrid::ServerGrid() {
 void ServerGrid::Display() {
 	for (int line = 0; line < 3; line++) {
 		for (int column = 0; column < 3; column++) {
-			//cout << boxList[line * 3 + column]->GetValue();
+			
 		}
-		//cout << endl;
 	}
 }
 
 void ServerGrid::SendGrid(vector<SOCKET> client_fd){
-	cout << "trying to send grid";
 	Json::Value grid;
 	string socketString;
 	for (int line = 0; line < 3; line++) {
@@ -40,7 +38,6 @@ void ServerGrid::SendGrid(vector<SOCKET> client_fd){
 
 	//sending the message to the client.
 	for (int i = 0; i < client_fd.size(); i++) {
-		cout << client_fd[i]<<endl;
 		int sendResult = send(client_fd[i], tmp, strlen(tmp), 0);
 		if (sendResult != strlen(tmp)) {
 			MessageBox(NULL, L"Send Failed", L"Error", MB_OK | MB_ICONERROR);

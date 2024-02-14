@@ -49,7 +49,6 @@ Json::Value ServerGame::GetPlayerDataFromSymbol(char symbol) {
 
 	for (int i = 0; i < playerList.size(); i++)
 	{
-		cout << "GET PLAYER DATA: " << playerList[i]["turnSymbol"] << endl;
 		if (static_cast<char>(playerList[i]["turnSymbol"].asInt()) == symbol) {
 			return playerList[i];
 		}
@@ -127,13 +126,10 @@ bool ServerGame::Place(int boxIndex) {
 	//checks if the spot is occupied
 	//if it isnt, add the current player's symbol.
 	
-
 	if (boxIndex < 0 || boxIndex > 8) {
-		cout << "Please enter a valid number!";
 		return false;
 	}
 	else if (currentGrid->boxList[boxIndex]->GetValue() != ' ') {
-		cout << "This box is already taken!";
 		return false;
 	}
 	else {
@@ -161,12 +157,10 @@ void ServerGame::End(char Winner, vector<SOCKET> client_fd) {
 
 	if (Winner == ' ') {
 		//return "draw", this will simply just end the game without changing any scores
-		cout << "It's a draw!" << endl;
 		gameResult["winner"] = "draw";
 	}
 	else {
 		//return the data of the winning player
-		cout << Winner << " wins !" << endl;
 
 		//get the winner's data
 		winnerData = GetPlayerDataFromSymbol(Winner);

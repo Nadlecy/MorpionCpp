@@ -185,7 +185,6 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 
 						//std::string playerName = fastWriter.write(board["playerName"]);
 						std::string playerName = board["playerName"].asCString();
-						cout << playerName;
 
 						if (!serverGame.CheckIfPlayer(playerName)) {
 							serverGame.NewPlayer(playerName);
@@ -201,14 +200,10 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 
 						Json::String playerName = board["playerName"].asCString();
 						int placeIndex = board["placeIndex"].asInt();
-						cout << "BOARD PLAYERNAME" << board["playerName"] << endl;
 						
 						Json::Value currentPlayer = serverGame.GetPlayerData(playerName);
-						cout << "CURRENT PLAYER NAME : " << currentPlayer["playerName"] << endl;
-						cout << "CURRENT PLAYER Symbol : " << static_cast<char>(currentPlayer["turnSymbol"].asInt()) <<endl ;
 
 						//check if it's their turn
-						cout <<"Current symbol : "<< serverGame.currentTurnSymbol <<endl;
 						if (serverGame.currentTurnSymbol == static_cast<char>(currentPlayer["turnSymbol"].asInt())) {
 							
 							//check if they can place it on the chosen space, then place it

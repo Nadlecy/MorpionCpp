@@ -83,8 +83,7 @@ int main()
 	serv_addr.sin_family = AF_INET;
 	serv_addr.sin_port = htons(PORT);
 
-	// Convert IPv4 and IPv6 addresses from text to binary
-	// form
+	// Convert IPv4 and IPv6 addresses from text to binary form
 	if (inet_pton(AF_INET, "10.1.144.26", &serv_addr.sin_addr)
 		<= 0) {
 		MessageBox(NULL, L"Invalid address / Address not supported", L"Error", MB_OK | MB_ICONERROR);
@@ -293,10 +292,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 						//when the server sends an updated grid
 						if (board["requestType"] == "sendGrid") {
-							cout << "hitting the griddy\n";
 
 							string gridString = board["grid"].asString();
-							cout << "Grid : |" << gridString <<"|";
 
 							for (int i = 0; i < 9; i++)
 							{
@@ -308,10 +305,9 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 						}
 						//when the server says the game is over
 						if (board["requestType"] == "end") {
-							cout << "im gonna end it istfg\n";
 
 							if (board["winner"] == "draw") {
-								cout << "it's a draw!\n";
+								cout << "it's a draw!" << endl;
 							}
 							else {
 								cout << board["winner"] << "wins!" << endl;
