@@ -103,7 +103,7 @@ int main()
 	// Message loop
 	MSG msg;
 	
-	while (GetMessage(&msg, NULL, 0, 0)) {
+	while (GetMessage(&msg, NULL, 0, 0) && serverGame.playing) {
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
@@ -219,8 +219,10 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 								//check for a victory
 								if (serverGame.currentGrid->WinCheck()!=' ') {
 									serverGame.End(serverGame.currentGrid->WinCheck(),serverGame.socketList);
+									serverGame.playing = false;
 								}else if (serverGame.currentGrid->IsFull()) {
 									serverGame.End(' ',serverGame.socketList);
+									serverGame.playing = false;
 								}
 							}
 						}

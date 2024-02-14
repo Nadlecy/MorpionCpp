@@ -125,6 +125,7 @@ int main()
 
 		//if logged in, check for events!
 		if (loggedIn) {
+			thisGame.window->Display(thisGame.currentGrid);
 			if (thisGame.inputs->EventCheck(username)) {
 				if (thisGame.inputs->readyToSend) {
 					send(clientSocket, thisGame.inputs->currentMessage.c_str(), strlen(thisGame.inputs->currentMessage.c_str()), 0);
@@ -293,21 +294,21 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 								thisGame.currentGrid[i] = gridString.at(i);
 							}
 
-							thisGame.window->Display(thisGame.currentGrid);
 							
 
+						}
 						//when the server says the game is over
-						}else if (board["requestType"] == "end") {
+						if (board["requestType"] == "end") {
 							cout << "im gonna end it istfg\n";
 
 							if (board["winner"] == "draw") {
 								cout << "it's a draw!\n";
 							}
 							else {
-								cout << "%s wins!\n", board["winner"];
-								cout << "your score is %d.\n", board["score"];
+								cout << board["winner"] << "wins!" << endl;
+								cout << "your score is" << board["score"] << endl;
 							}
-
+							thisGame.playing = false;
 							//ask to replay or end the game
 						}
 					}

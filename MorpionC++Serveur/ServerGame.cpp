@@ -36,7 +36,6 @@ Json::Value ServerGame::GetPlayerData(Json::String playerName) {
 
 	for (int i = 0; i < playerList.size(); i++)
 	{
-		cout << "GET PLAYER DATA: " << playerList[i]["username"] << endl;
 		if (playerList[i]["username"] == playerName) {
 			return playerList[i];
 		}
@@ -50,7 +49,8 @@ Json::Value ServerGame::GetPlayerDataFromSymbol(char symbol) {
 
 	for (int i = 0; i < playerList.size(); i++)
 	{
-		if (playerList[i]["turnSymbol"].toStyledString().at(0) == symbol) {
+		cout << "GET PLAYER DATA: " << playerList[i]["turnSymbol"] << endl;
+		if (static_cast<char>(playerList[i]["turnSymbol"].asInt()) == symbol) {
 			return playerList[i];
 		}
 	}
@@ -189,8 +189,10 @@ void ServerGame::End(char Winner, vector<SOCKET> client_fd) {
 		Json::FastWriter fastWriter;
 		std::string output = fastWriter.write(gameResult);
 		const char* tmp = output.c_str();
-
-		send(playerList[i]["socket"].asInt(), tmp, strlen(tmp), 0);
+		int sendResult = send(client_fd[i], tmp, strlen(tmp), 0);
+		if (sendResult != strlen(tmp)) {
+			MessageBox(NULL, L"Send Failed", L"Error", MB_OK | MB_ICONERROR);
+		}
 	}
 }
 
