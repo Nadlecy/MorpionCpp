@@ -119,9 +119,16 @@ int main()
 	
 	//GETS HERE TOO LATE, SERVER ALREADY SENT DATA BEFORE
 	//while we're ready to receive messages from the server, and we're still playing.
-	while (GetMessage(&msg, NULL, 0, 0) && thisGame.playing) {
+	while (GetMessage(&msg, NULL, 0, 0)) {
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
+
+		if (thisGame.playing != true) {
+			thisGame.window->Display(thisGame.currentGrid);
+			system("PAUSE");
+			break;
+		}
+
 
 		//if logged in, check for events!
 		if (loggedIn) {
