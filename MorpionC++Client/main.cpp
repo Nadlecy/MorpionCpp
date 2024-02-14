@@ -124,7 +124,9 @@ int main()
 		DispatchMessage(&msg);
 
 		if (thisGame.playing != true) {
+			
 			thisGame.window->Display(thisGame.currentGrid);
+
 			system("PAUSE");
 			break;
 		}

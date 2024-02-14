@@ -218,9 +218,11 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 
 								//check for a victory
 								if (serverGame.currentGrid->WinCheck()!=' ') {
+									serverGame.currentGrid->SendGrid(serverGame.socketList);
 									serverGame.End(serverGame.currentGrid->WinCheck(),serverGame.socketList);
 									serverGame.playing = false;
 								}else if (serverGame.currentGrid->IsFull()) {
+									serverGame.currentGrid->SendGrid(serverGame.socketList);
 									serverGame.End(' ',serverGame.socketList);
 									serverGame.playing = false;
 								}
