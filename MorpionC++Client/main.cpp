@@ -85,7 +85,7 @@ int main()
 
 	// Convert IPv4 and IPv6 addresses from text to binary
 	// form
-	if (inet_pton(AF_INET, "10.1.144.26", &serv_addr.sin_addr)
+	if (inet_pton(AF_INET, "192.168.1.152", &serv_addr.sin_addr)
 		<= 0) {
 		MessageBox(NULL, L"Invalid address / Address not supported", L"Error", MB_OK | MB_ICONERROR);
 		return -1;
@@ -114,6 +114,7 @@ int main()
 	bool loggedIn = false;
 
 	// Message loop
+	string username;
 	MSG msg;
 	
 	//GETS HERE TOO LATE, SERVER ALREADY SENT DATA BEFORE
@@ -122,18 +123,26 @@ int main()
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 
-		if (!loggedIn) {
+		//if logged in, check for events!
+		if (loggedIn) {
+			if (thisGame.inputs->EventCheck(username)) {
+				if (thisGame.inputs->readyToSend) {
+					send(clientSocket, thisGame.inputs->currentMessage.c_str(), strlen(thisGame.inputs->currentMessage.c_str()), 0);
+					thisGame.inputs->readyToSend = false;
+					thisGame.inputs->EmptyMessage();
+				}
+			}
+		} else if (!loggedIn) {
 			////////////////////////////////////////// LOGGING IN //////////////////////////////////////
 			// entering username.
-			string s;
 			cout << "Enter your Username : " << endl;
-			getline(cin, s);
+			getline(cin, username);
 			cout << endl;
 
 			// creating the request line for assigning the player's role in the game.
 			Json::Value firstReq;
 			firstReq["requestType"] = "Login";
-			firstReq["playerName"] = s;
+			firstReq["playerName"] = username;
 			firstReq["clientSocket"] = clientSocket;
 
 			//making the Json into a string.
@@ -277,6 +286,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 							cout << "hitting the griddy\n";
 
 							string gridString = board["grid"].asString();
+							cout << "Grid : |" << gridString <<"|";
 
 							for (int i = 0; i < 9; i++)
 							{

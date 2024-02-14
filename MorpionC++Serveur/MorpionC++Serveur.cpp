@@ -220,7 +220,6 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 
 					}
 					serverGame.currentGrid->SendGrid(serverGame.socketList);
-					MessageBoxA(hwnd, message.c_str(), "Notification", MB_OK | MB_ICONINFORMATION);
 				}
 			}
 			break;

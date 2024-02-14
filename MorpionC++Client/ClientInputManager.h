@@ -1,5 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include <string>
+#include <json/json.h>
 
 class ClientWindow;
 
@@ -11,8 +13,12 @@ public:
 	int mouseX;
 	int mouseY;
 
+	bool readyToSend;
+	std::string currentMessage;
+
 	ClientInputManager(ClientWindow* window);
 
-	bool EventCheck();
+	void EmptyMessage();
+	bool EventCheck(std::string username);
 };
 
