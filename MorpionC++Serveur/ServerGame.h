@@ -26,7 +26,7 @@ public:
 	
 	//server functions
 	bool CheckIfPlayer(string playerName);
-	Json::Value GetPlayerData(string playerName); 
+	Json::Value GetPlayerData(Json::String playerName); 
 	Json::Value GetPlayerDataFromSymbol(char symbol);
 	void NewPlayer(string playerName);
 	void PlayerSocketUpdate(string playerName);

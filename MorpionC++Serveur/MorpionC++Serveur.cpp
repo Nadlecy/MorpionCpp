@@ -143,7 +143,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 			// Prepare accepted socket for read, write, and close notification
 			cout << "Client Socket:" <<newSocket<<endl;
 			WSAAsyncSelect(newSocket, hwnd, WM_USER + 1, FD_READ | FD_CLOSE);
-			cout << "client connected\n";
+			cout << "client connected" << endl;
 			break;
 
 			//when a CONNECTED SOCKET is closed, not the server
@@ -183,7 +183,9 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 					//if player is logging in
 					if (board["requestType"] == "Login") {
 
-						std::string playerName = fastWriter.write(board["playerName"]);
+						//std::string playerName = fastWriter.write(board["playerName"]);
+						std::string playerName = board["playerName"].asCString();
+						cout << playerName;
 
 						if (!serverGame.CheckIfPlayer(playerName)) {
 							serverGame.NewPlayer(playerName);
@@ -197,11 +199,17 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 					//if player is trying to place their symbol on the grid
 					else if (board["requestType"] == "Place") {
 
-						std::string playerName = fastWriter.write(board["playerName"]);
+						Json::String playerName = board["playerName"].asCString();
 						int placeIndex = board["placeIndex"].asInt();
+						cout << "BOARD PLAYERNAME" << board["playerName"] << endl;
+						
+						Json::Value currentPlayer = serverGame.GetPlayerData(playerName);
+						cout << "CURRENT PLAYER NAME : " << currentPlayer["playerName"] << endl;
+						cout << "CURRENT PLAYER Symbol : " << static_cast<char>(currentPlayer["turnSymbol"].asInt()) <<endl ;
 
 						//check if it's their turn
-						if (serverGame.currentTurnSymbol == serverGame.GetPlayerData(playerName)["turnSymbol"].toStyledString().at(0)) {
+						cout <<"Current symbol : "<< serverGame.currentTurnSymbol <<endl;
+						if (serverGame.currentTurnSymbol == static_cast<char>(currentPlayer["turnSymbol"].asInt())) {
 							
 							//check if they can place it on the chosen space, then place it
 							if (serverGame.Place(placeIndex)) {

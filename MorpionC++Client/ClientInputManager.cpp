@@ -28,11 +28,13 @@ bool ClientInputManager::EventCheck(std::string username) {
 
 				mouseX = (oEvent.mouseButton.x - 100) / (Window->windowW / 3); // a modifier le 100 pour rendre la page responsive ( car il y a des bords a gauche et a droit qu'il ne faut pas compter)
 				mouseY = oEvent.mouseButton.y / (Window->windowH / 3) * 3;
-				cout << "clickyclicky";
+				cout << "click" << endl;
 
 				board["requestType"] = "Place";
-				board["playerName"] = (mouseX + mouseY * 3);
+				board["playerName"] = username;
 				board["placeIndex"] = (mouseX + mouseY * 3);
+				cout << username << endl;
+				cout << board["playerName"]<<endl;
 
 				//making the Json into a string.
 				Json::FastWriter fastWriter;
