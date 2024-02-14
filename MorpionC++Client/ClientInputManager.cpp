@@ -24,11 +24,17 @@ bool ClientInputManager::EventCheck(std::string username) {
 
 		}
 		else if (oEvent.type == sf::Event::MouseButtonReleased) {
-			if (oEvent.mouseButton.button == sf::Mouse::Left) {
 
-				mouseX = (oEvent.mouseButton.x - 100) / (Window->gameSquareS / 3); // a modifier le 100 pour rendre la page responsive ( car il y a des bords a gauche et a droit qu'il ne faut pas compter)
-				mouseY = oEvent.mouseButton.y / (Window->gameSquareS / 3) * 3;
-				cout << "click :3" << endl;
+			//if the click is in the gameSquareS
+			if (oEvent.mouseButton.button == sf::Mouse::Left &&
+				((oEvent.mouseButton.x > (Window->windowW - Window->gameSquareS) / 2) &&
+				(oEvent.mouseButton.x < Window->gameSquareS + (Window->windowW - Window->gameSquareS) / 2) &&
+				(oEvent.mouseButton.y > (Window->windowH - Window->gameSquareS) / 2) &&
+				(oEvent.mouseButton.y < Window->gameSquareS + (Window->windowH - Window->gameSquareS) / 2))) {
+
+
+				mouseX = (oEvent.mouseButton.x - (Window->windowW - Window->gameSquareS) / 2) / (Window->gameSquareS / 3);
+				mouseY = (oEvent.mouseButton.y - (Window->windowH - Window->gameSquareS) / 2) / (Window->gameSquareS / 3) * 3;
 
 				board["requestType"] = "Place";
 				board["playerName"] = username;

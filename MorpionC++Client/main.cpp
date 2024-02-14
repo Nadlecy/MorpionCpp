@@ -3,7 +3,7 @@
 #define NOMINMAX 
 #define PORT 6969
 #define DATA_BUFSIZE 8192
-//#define IPADDRESS 10.1.144.26
+#define IPADDRESS "10.1.144.26"
 
 #include <winsock2.h>
 #include <windows.h>
@@ -84,7 +84,7 @@ int main()
 	serv_addr.sin_port = htons(PORT);
 
 	// Convert IPv4 and IPv6 addresses from text to binary form
-	if (inet_pton(AF_INET, "10.1.144.26", &serv_addr.sin_addr)
+	if (inet_pton(AF_INET, IPADDRESS, &serv_addr.sin_addr)
 		<= 0) {
 		MessageBox(NULL, L"Invalid address / Address not supported", L"Error", MB_OK | MB_ICONERROR);
 		return -1;
@@ -252,12 +252,11 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		if (WSAGETSELECTERROR(lParam))
 		{
-			printf("Socket failed with error %d\n", WSAGETSELECTERROR(lParam));
+			cout << "Socket failed with error " << WSAGETSELECTERROR(lParam) << endl;
 			FreeSocketInformation(wParam);
 		}
 		else
 		{
-			printf("Socket looks fine!\n");
 
 			// Determine what event occurred on the socket
 			switch (WSAGETSELECTEVENT(lParam)) {
