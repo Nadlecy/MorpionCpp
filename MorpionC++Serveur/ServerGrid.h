@@ -7,12 +7,15 @@
 #include <json/json.h>
 
 #include "ServerGridBox.h"
+#include "..\MorpionC++Webserver\Bank.h"
 
 using namespace std;
 
 class ServerGrid
 {
 public:
+	
+
 	vector<ServerGridBox*> boxList;
 
 	ServerGrid();

@@ -7,6 +7,7 @@
 #include "ServerGame.h"
 
 
+
 #define PORT 6969
 //#define WM_SOCKET WM_USER + 1
 
@@ -15,7 +16,6 @@
 using namespace std;
 
 ServerGame serverGame = ServerGame();
-
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 

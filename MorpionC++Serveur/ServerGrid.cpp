@@ -1,8 +1,8 @@
 #include "ServerGrid.h"
 
-
 //creates a new grid composed of 9 empty boxes
 ServerGrid::ServerGrid() {
+	Bank bank = Bank();
 	for (int i = 0; i < 9; i++)
 	{
 		boxList.push_back(new ServerGridBox());
@@ -24,6 +24,7 @@ void ServerGrid::SendGrid(vector<SOCKET> client_fd){
 	for (int line = 0; line < 3; line++) {
 		for (int column = 0; column < 3; column++) {
 			socketString.push_back(boxList[line * 3 + column]->GetValue());
+			//bank.AddToBank(line * 3 + column, boxList[line * 3 + column]->GetValue());
 		}
 	}
 	
